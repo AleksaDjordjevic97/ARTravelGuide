@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_bg"
+    tools:context=".MainActivity">
+
+    <com.revosleap.curveview.CurveView
+        android:id="@+id/curveViewMain"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:cv_background_color="@color/white"
+        app:cv_curve_direction="top"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/logoMain"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintCircleRadius="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo_globe_shadow" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnTouristMain"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/button_green"
+        android:text="TOURIST"
+        android:textSize="25sp"
+        android:fontFamily="@font/momcake_bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/curveViewMain" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnGuideMain"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/button_green"
+        android:fontFamily="@font/momcake_bold"
+        android:text="GUIDE"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnTouristMain" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "369297021631",
+    "project_id": "augmented-travel-guide",
+    "storage_bucket": "augmented-travel-guide.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369297021631:android:55a1685fb5c999d50e840a",
+        "android_client_info": {
+          "package_name": "com.aleksadjordjevic.augmentedtravelguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369297021631-agtk2utojc7nhceo2d3upf27ki1rha44.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aleksadjordjevic.augmentedtravelguide",
+            "certificate_hash": "cfb3b15d3bb10b133b9cb9d7c2b28d5f29e459f4"
+          }
+        },
+        {
+          "client_id": "369297021631-k15scjhrdneb6bma1noqsfi8mjgasq8n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7VTsY2xjdruHnZrHhVp2BlwqIxGGC8KI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369297021631-k15scjhrdneb6bma1noqsfi8mjgasq8n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

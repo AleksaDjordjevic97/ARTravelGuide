@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityRegisterBinding
+import com.aleksadjordjevic.augmentedtravelguide.models.Register2Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
@@ -158,15 +159,15 @@ class RegisterActivity : AppCompatActivity()
             )
 
             Firebase.firestore.collection("users").document(user["userID"]!!).set(user).addOnCompleteListener {
-                sendToMap()
+                sendToRegister2()
             }
         }
     }
 
-    private fun sendToMap()
+    private fun sendToRegister2()
     {
-        val mapIntent = Intent(this, MapActivity::class.java)
-        startActivity(mapIntent)
+        val reg2Intent = Intent(this, Register2Activity::class.java)
+        startActivity(reg2Intent)
         finish()
     }
 

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/white_bg"
+    tools:context=".models.Register2Activity">
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/imgUserRegister2"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/user"
+        app:civ_border_color="#0098ad"
+        app:civ_border_width="4dp"
+        app:civ_shadow="true"
+        app:civ_shadow_radius="10dp"
+        app:civ_shadow_color="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewOrganizationNameRegister2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/momcake_thin"
+        android:text="Organization Name"
+        android:textColor="@color/light_gray"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/txtOrganizationNameRegister2"
+        app:layout_constraintStart_toStartOf="@+id/txtOrganizationNameRegister2" />
+
+    <EditText
+        android:id="@+id/txtOrganizationNameRegister2"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgUserRegister2" />
+
+    <TextView
+        android:id="@+id/textViewPhoneRegister2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/momcake_thin"
+        android:text="Phone Number"
+        android:textColor="@color/light_gray"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/txtPhoneRegister2"
+        app:layout_constraintStart_toStartOf="@+id/txtPhoneRegister2" />
+
+    <EditText
+        android:id="@+id/txtPhoneRegister2"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:inputType="textPassword"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtOrganizationNameRegister2" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnContinueRegister2"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/button_green"
+        android:fontFamily="@font/momcake_bold"
+        android:text="Continue"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtPhoneRegister2" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

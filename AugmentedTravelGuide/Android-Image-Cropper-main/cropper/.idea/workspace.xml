@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b60f0735-8578-4996-988d-a4114aa53851" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/Register2Activity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_register2.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/RegisterActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/RegisterActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/UserClient.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/UserModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/drawable-v24/back_btn.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/drawable-v24/main_bg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../build.gradle" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="ProjectId" id="1xDXolmiRE5Xp4wI5pXweiXZQ4Q" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b60f0735-8578-4996-988d-a4114aa53851" name="Default Changelist" comment="" />
+      <created>1629890809841</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1629890809841</updated>
+    </task>
+    <servers />
+  </component>
+</project>

@@ -5,18 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b60f0735-8578-4996-988d-a4114aa53851" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/Register2Activity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_register2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../app/src/debug/res/values/google_maps_api.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../app/src/release/res/values/google_maps_api.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/RegisterActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/RegisterActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/UserClient.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/models/UserModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/drawable-v24/back_btn.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/drawable-v24/main_bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/MapActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/java/com/aleksadjordjevic/augmentedtravelguide/MapActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_map.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/res/layout/activity_map.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

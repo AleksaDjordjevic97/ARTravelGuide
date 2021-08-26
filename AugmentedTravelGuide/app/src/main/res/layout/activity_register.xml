@@ -37,6 +37,8 @@
         android:text="REGISTER"
         android:textColor="@color/white"
         android:textSize="60sp"
+        android:shadowColor="@color/black"
+        android:shadowRadius="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,6 +52,8 @@
         android:text="Create a new account"
         android:textColor="@color/white"
         android:textSize="15sp"
+        android:shadowColor="@color/black"
+        android:shadowRadius="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewRegister" />
 

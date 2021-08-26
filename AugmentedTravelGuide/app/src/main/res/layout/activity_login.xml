@@ -37,6 +37,8 @@
         android:text="Login"
         android:textColor="@color/white"
         android:textSize="60sp"
+        android:shadowColor="@color/black"
+        android:shadowRadius="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,6 +52,8 @@
         android:text="Sign in to an existing account"
         android:textColor="@color/white"
         android:textSize="15sp"
+        android:shadowColor="@color/black"
+        android:shadowRadius="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewLogin" />
 

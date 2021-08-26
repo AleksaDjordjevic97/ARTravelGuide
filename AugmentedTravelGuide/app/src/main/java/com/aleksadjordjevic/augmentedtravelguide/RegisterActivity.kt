@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityRegisterBinding
-import com.aleksadjordjevic.augmentedtravelguide.models.Register2Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser

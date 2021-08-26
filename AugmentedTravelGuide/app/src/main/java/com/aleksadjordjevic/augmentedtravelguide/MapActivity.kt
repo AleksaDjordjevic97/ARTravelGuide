@@ -1,16 +1,26 @@
 package com.aleksadjordjevic.augmentedtravelguide
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
-import android.view.View
+import android.view.*
+import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -20,8 +30,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityMapBinding
 import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFragment
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
+import com.aleksadjordjevic.augmentedtravelguide.models.User
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -32,6 +45,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 {
 
     private lateinit var binding: ActivityMapBinding
+    private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
 
     private lateinit var auth:FirebaseAuth
 
@@ -52,10 +66,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         mapFragment.getMapAsync(this)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
+
+        setupNavView()
+        setupOnClickListeners()
+
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser == null)
+        {
             binding.fabAddPlace.visibility = View.INVISIBLE
+            binding.btnOpenNavView.visibility = View.INVISIBLE
+            binding.drawerLayoutMap.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        }
+        else
+            setupNavViewHeader()
 
+    }
+
+    @SuppressLint("RtlHardcoded")
+    private fun setupOnClickListeners()
+    {
         binding.fabARView.setOnClickListener {
             val arIntent = Intent(this, ARActivity::class.java)
             startActivity(arIntent)
@@ -64,11 +93,76 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         binding.fabAddPlace.setOnClickListener {
             addNewPlaceMarker()
         }
+
+        binding.btnOpenNavView.setOnClickListener {
+            binding.drawerLayoutMap.openDrawer(Gravity.LEFT)
+        }
     }
+
+    private fun setupNavView()
+    {
+        actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerLayoutMap,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        binding.drawerLayoutMap.addDrawerListener(actionBarDrawerToggle!!)
+        actionBarDrawerToggle!!.syncState()
+        binding.navViewGuide.setNavigationItemSelectedListener{ menuItem ->
+            userMenuSelector(menuItem)
+            false
+        }
+    }
+
+    private fun setupNavViewHeader()
+    {
+        Firebase.firestore.collection("users").document(auth.currentUser!!.uid).get()
+            .addOnSuccessListener { document ->
+                val user = document.toObject(User::class.java)
+                Glide.with(this).load(user!!.profile_image)
+                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
+                binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
+                    user!!.organization_name
+                binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user!!.phone
+
+            }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        return if(actionBarDrawerToggle != null)
+        {
+            if (actionBarDrawerToggle!!.onOptionsItemSelected(item))
+            {
+                true
+            }
+            else super.onOptionsItemSelected(item)
+        }
+        else super.onOptionsItemSelected(item)
+    }
+
+    fun userMenuSelector(item: MenuItem)
+    {
+        when (item.itemId)
+        {
+            R.id.nav_places ->
+            {
+                //edit places intent
+            }
+            R.id.nav_signout ->
+            {
+                auth.signOut()
+                finish()
+            }
+        }
+    }
+
+
 
     private fun addNewPlaceMarker()
     {
-        TODO("Not yet implemented")
+
     }
 
 

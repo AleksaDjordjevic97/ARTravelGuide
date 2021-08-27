@@ -109,7 +109,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
         if(photoUriForNewPhoto != null)
         {
             val filepath = FirebaseStorage.getInstance().reference.child("images_for_scanning")
-                .child("${place.guideID}.jpeg")
+                .child("${place.id}.jpeg")
             filepath.putFile(photoUriForNewPhoto!!).addOnSuccessListener { taskSnapshot ->
 
                 filepath.downloadUrl.addOnSuccessListener { uri ->

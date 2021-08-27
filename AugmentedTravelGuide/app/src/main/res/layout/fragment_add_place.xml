@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.AddPlaceFragment">
+
+    <ImageButton
+        android:id="@+id/btCloseAddPlace"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/close_btn"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/momcake_bold"
+        android:text="Add new place"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/addPlaceNum1"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="100dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/number_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <ImageView
+        android:id="@+id/addPlaceImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="70dp"
+        android:src="@drawable/add_image_placeholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+    <ImageView
+        android:id="@+id/addPlaceNum2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="70dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/number_2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addPlaceNum1" />
+
+
+    <ImageButton
+        android:id="@+id/btnUploadMP4"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/upload_mp4_btn"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toEndOf="@+id/addPlaceNum2"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/momcake_thin"
+        android:text="OR"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/btnUploadMP4"
+        app:layout_constraintEnd_toStartOf="@+id/btnUploadGLB"
+        app:layout_constraintStart_toEndOf="@+id/btnUploadMP4"
+        app:layout_constraintTop_toTopOf="@+id/btnUploadMP4" />
+
+    <ImageButton
+        android:id="@+id/btnUploadGLB"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/upload_glb_btn"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="30dp"
+        app:layout_constraintStart_toEndOf="@+id/btnUploadMP4"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
+
+
+    <TextView
+        android:id="@+id/addPlaceUploadFileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/momcake_thin"
+        android:text="No File Selected"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum2"
+        app:layout_constraintStart_toEndOf="@+id/btnUploadGLB"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
+
+
+    <ImageView
+        android:id="@+id/addPlaceNum3"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/number_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addPlaceNum2" />
+
+
+    <EditText
+        android:id="@+id/txtLatAddPlace"
+        android:layout_width="90dp"
+        android:layout_height="40dp"
+        android:fontFamily="@font/momcake_bold"
+        android:hint="Lat"
+        android:inputType="numberSigned|numberDecimal"
+        android:textColor="@color/black"
+        android:textColorHint="@color/light_gray"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum3"
+        app:layout_constraintStart_toStartOf="@+id/txtNameAddPlace"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum3" />
+
+    <EditText
+        android:id="@+id/txtLngAddPlace"
+        android:layout_width="90dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="50dp"
+        android:fontFamily="@font/momcake_bold"
+        android:hint="Lng"
+        android:inputType="numberSigned|numberDecimal"
+        android:textColor="@color/black"
+        android:textColorHint="@color/light_gray"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum3"
+        app:layout_constraintStart_toEndOf="@+id/txtLatAddPlace"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum3" />
+
+
+
+    <ImageView
+        android:id="@+id/addPlaceNum4"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/number_4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addPlaceNum3" />
+
+    <EditText
+        android:id="@+id/txtNameAddPlace"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/black"
+        android:hint="Name"
+        android:textColorHint="@color/light_gray"
+        android:fontFamily="@font/momcake_bold"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addPlaceNum4"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum4" />
+
+
+    <ImageView
+        android:id="@+id/addPlaceNum5"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/number_5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addPlaceNum4" />
+
+    <EditText
+        android:id="@+id/txtDescriptionAddPlace"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/black"
+        android:hint="Description"
+        android:textColorHint="@color/light_gray"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:fontFamily="@font/momcake_thin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addPlaceNum5"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum5" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnAddPlace"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/button_green"
+        android:fontFamily="@font/momcake_bold"
+        android:text="Add"
+        android:textSize="25sp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,7 +8,6 @@ import android.location.Location
 import android.location.LocationListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -16,11 +15,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -28,13 +22,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityMapBinding
+import com.aleksadjordjevic.augmentedtravelguide.fragments.AddPlaceFragment
 import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFragment
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.aleksadjordjevic.augmentedtravelguide.models.User
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -163,7 +157,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
     private fun addNewPlaceMarker()
     {
-
+        val addPlaceDialogFragment = AddPlaceFragment(auth.currentUser!!.uid)
+        addPlaceDialogFragment.show(supportFragmentManager, "AddPlaceFragment")
     }
 
 

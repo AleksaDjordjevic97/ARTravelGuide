@@ -61,7 +61,7 @@
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
-        android:inputType="textPassword"
+        android:inputType="phone"
         android:textColor="@color/black"
         android:backgroundTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"

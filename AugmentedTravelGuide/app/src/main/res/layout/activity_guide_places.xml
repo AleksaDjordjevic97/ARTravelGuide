@@ -14,7 +14,7 @@
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
         android:src="@drawable/back_black_btn"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

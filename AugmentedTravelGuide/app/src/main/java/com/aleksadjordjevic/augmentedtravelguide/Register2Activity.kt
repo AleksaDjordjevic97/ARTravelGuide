@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
+import com.aleksadjordjevic.augmentedtravelguide.MapActivity
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityRegister2Binding
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth

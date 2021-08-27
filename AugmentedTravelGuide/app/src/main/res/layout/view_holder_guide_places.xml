@@ -43,7 +43,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
             android:fontFamily="@font/momcake_thin"
-            android:text="asfafasfasfasfasfasfasf"
+            android:text="Description"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="11sp"
@@ -66,7 +66,7 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingStart="5dp"
-        android:paddingEnd="5dp"/>
+        android:paddingEnd="2.5dp"/>
 
     <ImageButton
         android:id="@+id/btnGuidePlacesRemove"
@@ -80,7 +80,7 @@
         android:background="@android:color/transparent"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:paddingStart="5dp"
+        android:paddingStart="2.5dp"
         android:paddingEnd="5dp"
 />
 

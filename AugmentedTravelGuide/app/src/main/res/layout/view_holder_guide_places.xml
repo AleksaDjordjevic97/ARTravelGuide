@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.7">
+
+        <ImageView
+            android:id="@+id/guidePlacesCellImage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/logo_globe"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/guidePlacesCellName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:fontFamily="@font/momcake_bold"
+            android:text="NAME"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/guidePlacesCellImage"
+            app:layout_constraintTop_toTopOf="@+id/guidePlacesCellImage" />
+
+        <TextView
+            android:id="@+id/guidePlacesCellDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/momcake_thin"
+            android:text="asfafasfasfasfasfasfasf"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="11sp"
+            app:layout_constraintStart_toEndOf="@+id/guidePlacesCellImage"
+            app:layout_constraintTop_toBottomOf="@+id/guidePlacesCellName" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/btnGuidePlacesEdit"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@+id/constraintLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.15"
+        android:src="@drawable/edit_place_btn"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"/>
+
+    <ImageButton
+        android:id="@+id/btnGuidePlacesRemove"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@+id/btnGuidePlacesEdit"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.15"
+        android:src="@drawable/remove_places_btn"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

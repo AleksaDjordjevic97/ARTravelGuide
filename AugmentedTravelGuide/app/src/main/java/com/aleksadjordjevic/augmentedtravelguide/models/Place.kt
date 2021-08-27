@@ -6,6 +6,7 @@ class Place()
 
 {
     var id:String = ""
+    var guideID:String = ""
     var name:String = ""
     var description:String = ""
     var geoPoint:GeoPoint = GeoPoint(0.0, 0.0)

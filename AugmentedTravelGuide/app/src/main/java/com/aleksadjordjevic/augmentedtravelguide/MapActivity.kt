@@ -148,7 +148,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         {
             R.id.nav_places ->
             {
-                //edit places intent
+                val placesIntent = Intent(this, GuidePlacesActivity::class.java)
+                startActivity(placesIntent)
             }
             R.id.nav_signout ->
             {

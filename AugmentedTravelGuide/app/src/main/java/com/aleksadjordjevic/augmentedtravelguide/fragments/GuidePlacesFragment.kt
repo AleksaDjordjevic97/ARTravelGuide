@@ -5,29 +5,38 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.aleksadjordjevic.augmentedtravelguide.R
-import com.aleksadjordjevic.augmentedtravelguide.databinding.FragmentMarkerBinding
+import com.aleksadjordjevic.augmentedtravelguide.adapters.GuidePlaceAdapter
+import com.aleksadjordjevic.augmentedtravelguide.databinding.FragmentGuidePlacesBinding
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
-class MarkerFragment(private val placeID:String) : DialogFragment()
+class GuidePlacesFragment(private val place:Place) : DialogFragment()
 {
-    private var _binding:FragmentMarkerBinding? = null
+
+    private var _binding: FragmentGuidePlacesBinding? = null
     private val binding get() = _binding!!
+
+
+    private lateinit var guidePlacesAdapter:GuidePlaceAdapter
+    private var placesList = ArrayList<Place>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View?
     {
-        _binding = FragmentMarkerBinding.inflate(inflater,container,false)
+        _binding = FragmentGuidePlacesBinding.inflate(inflater,container,false)
         return binding.root
     }
 
@@ -58,16 +67,27 @@ class MarkerFragment(private val placeID:String) : DialogFragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        Firebase.firestore.collection("places").document(placeID).get().addOnSuccessListener{ document ->
+        Glide.with(this).load(place.image_for_scanning).into(binding.guidePlacesFragmentImage)
+        binding.guidePlacesFragmentName.setText(place.name)
+        binding.guidePlacesFragmentDescription.setText(place.description)
 
-            val place = document?.toObject(Place::class.java)
-            Glide.with(this).load(place!!.image_for_scanning).into(binding.markerFragmentImage)
-            binding.markerFragmentName.text = place.name
-            binding.markerFragmentDescription.text = place.description
+        binding.btnGuidePlacesFragmentClose.setOnClickListener { dismiss() }
+        binding.btnGuidePlacesFragmentSave.setOnClickListener { saveChanges() }
+    }
+
+    private fun saveChanges()
+    {
+        place.name =  binding.guidePlacesFragmentName.text.toString()
+        place.description = binding.guidePlacesFragmentDescription.text.toString()
+        Firebase.firestore.collection("places").document(place.id).set(place, SetOptions.merge()).addOnCompleteListener { task->
+
+            if(task.isSuccessful)
+                Toast.makeText(requireContext(),"Changes made successfully!",Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(requireContext(),"Changes failed. Try again later",Toast.LENGTH_SHORT).show()
+
+            dismiss()
         }
-
-        binding.btnMarkerFragmentClose.setOnClickListener { dismiss() }
-
     }
 
 

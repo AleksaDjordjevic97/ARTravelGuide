@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ import com.aleksadjordjevic.augmentedtravelguide.adapters.GuidePlaceAdapter
 import com.aleksadjordjevic.augmentedtravelguide.databinding.FragmentGuidePlacesBinding
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -33,6 +36,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
     private lateinit var guidePlacesAdapter:GuidePlaceAdapter
     private var placesList = ArrayList<Place>()
     private var photoUriForNewPhoto:Uri? = null
+    private var latLngCorrect = true
 
     private val galleryImageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     { result -> if (result.resultCode == Activity.RESULT_OK) setNewImage(result.data?.data)}
@@ -80,10 +84,57 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
         Glide.with(this).load(place.image_for_scanning).into(binding.guidePlacesFragmentImage)
         binding.guidePlacesFragmentName.setText(place.name)
         binding.guidePlacesFragmentDescription.setText(place.description)
+        binding.guidePlacesFragmentLat.setText(place.geoPoint.latitude.toString())
+        binding.guidePlacesFragmentLng.setText(place.geoPoint.longitude.toString())
 
         binding.btnGuidePlacesFragmentClose.setOnClickListener { dismiss() }
         binding.btnGuidePlacesFragmentSave.setOnClickListener { saveChanges() }
         binding.guidePlacesFragmentImage.setOnClickListener { openGallery() }
+
+        setupTextChangeListeners()
+    }
+
+    private fun setupTextChangeListeners()
+    {
+
+        binding.guidePlacesFragmentLat.addTextChangedListener(object : TextWatcher
+        {
+            override fun afterTextChanged(s: Editable)
+            {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int)
+            {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int)
+            {
+                latLngCorrect = binding.guidePlacesFragmentLat.text.toString().toDouble() <= 90.0 && binding.guidePlacesFragmentLat.text.toString().toDouble() >= -90.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() <= 180.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() >= -180.0
+            }
+        })
+
+        binding.guidePlacesFragmentLng.addTextChangedListener(object : TextWatcher
+        {
+            override fun afterTextChanged(s: Editable)
+            {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int)
+            {
+
+
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int)
+            {
+                latLngCorrect = binding.guidePlacesFragmentLat.text.toString().toDouble() <= 90.0 && binding.guidePlacesFragmentLat.text.toString().toDouble() >= -90.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() <= 180.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() >= -180.0
+            }
+        })
+
     }
 
     private fun openGallery()
@@ -105,31 +156,51 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
 
     private fun saveChanges()
     {
-
-        if(photoUriForNewPhoto != null)
+        if(checkIfNoEmptyFields())
         {
-            val filepath = FirebaseStorage.getInstance().reference.child("images_for_scanning")
-                .child("${place.id}.jpeg")
-            filepath.putFile(photoUriForNewPhoto!!).addOnSuccessListener { taskSnapshot ->
+            if(latLngCorrect)
+            {
+                val geoPoint = GeoPoint(binding.guidePlacesFragmentLat.text.toString().toDouble(),binding.guidePlacesFragmentLng.text.toString().toDouble())
+                if (photoUriForNewPhoto != null)
+                {
+                    val filepath =
+                        FirebaseStorage.getInstance().reference.child("images_for_scanning")
+                            .child("${place.id}.jpeg")
+                    filepath.putFile(photoUriForNewPhoto!!).addOnSuccessListener { taskSnapshot ->
 
-                filepath.downloadUrl.addOnSuccessListener { uri ->
+                        filepath.downloadUrl.addOnSuccessListener { uri ->
 
-                    place.image_for_scanning =  uri.toString()
-                    place.name =  binding.guidePlacesFragmentName.text.toString()
+                            place.image_for_scanning = uri.toString()
+                            place.name = binding.guidePlacesFragmentName.text.toString()
+                            place.description =
+                                binding.guidePlacesFragmentDescription.text.toString()
+                            place.geoPoint = geoPoint
+
+                            updatePlaceInDB()
+                        }
+                    }
+                }
+                else
+                {
+                    place.name = binding.guidePlacesFragmentName.text.toString()
                     place.description = binding.guidePlacesFragmentDescription.text.toString()
+                    place.geoPoint = geoPoint
 
                     updatePlaceInDB()
                 }
             }
+            else
+                Toast.makeText(requireContext(),"Latitude must be between -90 and 90; Longitude must be between -180 and 180",Toast.LENGTH_SHORT).show()
+
         }
         else
-        {
-            place.name =  binding.guidePlacesFragmentName.text.toString()
-            place.description = binding.guidePlacesFragmentDescription.text.toString()
+            Toast.makeText(requireContext(),"Make sure you typed in all fields",Toast.LENGTH_SHORT).show()
 
-            updatePlaceInDB()
-        }
+    }
 
+    private fun checkIfNoEmptyFields():Boolean
+    {
+        return binding.guidePlacesFragmentLat.text.isNotEmpty() && binding.guidePlacesFragmentLng.text.isNotEmpty() &&binding.guidePlacesFragmentName.text.isNotEmpty() && binding.guidePlacesFragmentDescription.text.isNotEmpty()
     }
 
     private fun updatePlaceInDB()

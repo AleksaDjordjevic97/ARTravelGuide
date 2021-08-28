@@ -77,7 +77,7 @@ public class ARActivity extends AppCompatActivity implements
 //            return insets.consumeSystemWindowInsets();
 //        });
 
-        
+
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
         if (savedInstanceState == null) {

@@ -80,7 +80,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private fun setupOnClickListeners()
     {
         binding.fabARView.setOnClickListener {
-            val arIntent = Intent(this, ARActivity::class.java)
+            val arIntent = Intent(this, ARCameraActivity::class.java)
             startActivity(arIntent)
         }
 

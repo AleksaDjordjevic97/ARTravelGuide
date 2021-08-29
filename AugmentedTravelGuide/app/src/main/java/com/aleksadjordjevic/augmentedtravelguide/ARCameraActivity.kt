@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
+import com.bumptech.glide.Glide
 import com.google.android.filament.ColorGrading
 import com.google.android.filament.filamat.MaterialBuilder
 import com.google.android.filament.filamat.MaterialPackage
@@ -45,6 +46,11 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
     private var plainVideoMaterial: Material? = null
     private var mediaPlayer: MediaPlayer? = null
     private val futures: MutableList<CompletableFuture<*>> = ArrayList()
+
+    private lateinit var matrixImage:Bitmap
+    private lateinit var matrixModelURL:String
+
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -55,6 +61,8 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
 //            ((ViewGroup.MarginLayoutParams) toolbar.getLayoutParams()).topMargin = insets.getSystemWindowInsetTop();
 //            return insets.consumeSystemWindowInsets();
 //        });
+        loadUserImageToFinal()
+
         Handler(Looper.getMainLooper()).postDelayed({
 
             supportFragmentManager.addFragmentOnAttachListener(this)
@@ -78,6 +86,23 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
 
     }
 
+    private fun loadUserImageToFinal()
+    {
+        val userImageFilename = intent.getStringExtra("USER_IMAGE_BITMAP_FILENAME")
+        val userImageURL = intent.getStringExtra("URL_MODEL")
+        try
+        {
+            val inputStream = this.openFileInput(userImageFilename)
+            matrixImage = BitmapFactory.decodeStream(inputStream)
+            matrixModelURL = userImageURL!!
+            inputStream.close()
+
+        } catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
     override fun onAttachFragment(fragmentManager: FragmentManager, fragment: Fragment)
     {
         if (fragment.id == R.id.arFragment)
@@ -99,7 +124,7 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
         // This is how database is created at runtime
         // You can also prebuild database in you computer and load it directly (see: https://developers.google.com/ar/develop/java/augmented-images/guide#database)
         database = AugmentedImageDatabase(session)
-        val matrixImage = BitmapFactory.decodeResource(resources, R.drawable.matrix)
+      //  val matrixImage = BitmapFactory.decodeResource(resources, R.drawable.matrix)
         val rabbitImage = BitmapFactory.decodeResource(resources, R.drawable.rabbit)
         // Every image has to have its own unique String identifier
         database!!.addImage("matrix", matrixImage)
@@ -150,6 +175,7 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
     {
         futures.add(
             ModelRenderable.builder()
+             //   .setSource(this, Uri.parse("models/Video.glb"))
                 .setSource(this, Uri.parse("models/Video.glb"))
                 .setIsFilamentGltf(true)
                 .build()
@@ -260,11 +286,12 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
             {
                 rabbitDetected = true
                 Toast.makeText(this, "Rabbit tag detected", Toast.LENGTH_LONG).show()
-                anchorNode.worldScale = Vector3(3.5f, 3.5f, 3.5f)
+               // anchorNode.worldScale = Vector3(3.5f, 3.5f, 3.5f)
+                anchorNode.worldScale = Vector3(1.5f, 1.5f, 1.5f)
                 arFragment!!.arSceneView.scene.addChild(anchorNode)
                 futures.add(
                     ModelRenderable.builder()
-                        .setSource(this, Uri.parse("models/Rabbit.glb"))
+                        .setSource(this, Uri.parse(matrixModelURL))
                         .setIsFilamentGltf(true)
                         .build()
                         .thenAccept({ rabbitModel: ModelRenderable? ->

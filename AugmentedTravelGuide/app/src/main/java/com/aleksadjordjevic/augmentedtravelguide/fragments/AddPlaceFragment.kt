@@ -94,7 +94,6 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
     private fun setupOnClickListeners()
     {
         binding.addPlaceImage.setOnClickListener { openGallery() }
-        binding.btnUploadMP4.setOnClickListener { uploadVideo() }
         binding.btnUploadGLB.setOnClickListener { uploadGLB() }
         binding.btnAddPlace.setOnClickListener { createNewPlace() }
         binding.btCloseAddPlace.setOnClickListener { dismiss() }
@@ -108,14 +107,6 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
         modelIntent.type = "application/*"
         galleryModelResult.launch(modelIntent)
         modelType = ".glb"
-    }
-
-    private fun uploadVideo()
-    {
-        val videoIntent = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        videoIntent.type = "video/mp4"
-        galleryModelResult.launch(videoIntent)
-        modelType = ".mp4"
     }
 
     private fun setNewModel(modelUri: Uri?)

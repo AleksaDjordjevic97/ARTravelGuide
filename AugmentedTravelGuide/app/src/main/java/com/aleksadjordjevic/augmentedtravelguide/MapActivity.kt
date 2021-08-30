@@ -108,40 +108,40 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         binding.fabARView.setOnClickListener {
 
 
-            Firebase.firestore.collection("places").document("9Dbfb6Hbxy2oI21wDwfC").get().addOnCompleteListener { task->
-                if(task.isSuccessful)
-                {
-                    val imageURL = task.result.getString("image_for_scanning")
+//            Firebase.firestore.collection("places").document("9Dbfb6Hbxy2oI21wDwfC").get().addOnCompleteListener { task->
+//                if(task.isSuccessful)
+//                {
+//                    val imageURL = task.result.getString("image_for_scanning")
+//
+//
+//
+//                    Glide.with(this)
+//                        .asBitmap()
+//                        .load(imageURL)
+//                        .into(object : CustomTarget<Bitmap>(){
+//                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+//
+//                                compressBitmapToStream("bitmap.png", resource)
+//                                val uri = downloadPdf(this@MapActivity,task.result.getString("model_for_ar"),"bla")
+//                                val arIntent = Intent(this@MapActivity, ARCameraActivity::class.java)
+//                                arIntent.putExtra("USER_IMAGE_BITMAP_FILENAME", "bitmap.png")
+//                                arIntent.putExtra("URL_MODEL",uri.toString())
+//                                startActivity(arIntent)
+//
+//
+//                            }
+//                            override fun onLoadCleared(placeholder: Drawable?) {
+//                                // this is called when imageView is cleared on lifecycle call or for
+//                                // some other reason.
+//                                // if you are referencing the bitmap somewhere else too other than this imageView
+//                                // clear it here as you can no longer have the bitmap
+//                            }
+//                        })
+//                }
+//            }
 
 
-
-                    Glide.with(this)
-                        .asBitmap()
-                        .load(imageURL)
-                        .into(object : CustomTarget<Bitmap>(){
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-
-                                compressBitmapToStream("bitmap.png", resource)
-                                val uri = downloadPdf(this@MapActivity,task.result.getString("model_for_ar"),"bla")
-                                val arIntent = Intent(this@MapActivity, ARCameraActivity::class.java)
-                                arIntent.putExtra("USER_IMAGE_BITMAP_FILENAME", "bitmap.png")
-                                arIntent.putExtra("URL_MODEL",uri.toString())
-                                startActivity(arIntent)
-
-
-                            }
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                                // this is called when imageView is cleared on lifecycle call or for
-                                // some other reason.
-                                // if you are referencing the bitmap somewhere else too other than this imageView
-                                // clear it here as you can no longer have the bitmap
-                            }
-                        })
-                }
-            }
-
-
-
+            getNearestPlaceToUser()
 
 
         }
@@ -155,6 +155,64 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         }
     }
 
+    private fun getNearestPlaceToUser()
+    {
+
+        Firebase.firestore.collection("places").get().addOnCompleteListener { task->
+            if(task.isSuccessful)
+            {
+                var distance = Float.MAX_VALUE
+                var nearestPlace:Place? = null
+
+                for(doc in task.result)
+                {
+                    val place = doc.toObject(Place::class.java)
+                    val placeLocation = Location("placeLocation")
+                    placeLocation.latitude = place.geoPoint.latitude
+                    placeLocation.longitude = place.geoPoint.longitude
+
+                    if(lastKnownLocation!!.distanceTo(placeLocation) < distance)
+                    {
+                        distance = lastKnownLocation!!.distanceTo(placeLocation)
+                        nearestPlace = place
+                    }
+                }
+
+                if(nearestPlace != null)
+                    downloadImageAndModel(nearestPlace)
+            }
+        }
+    }
+
+    private fun downloadImageAndModel(nearestPlace: Place)
+    {
+
+        Glide.with(this)
+            .asBitmap()
+            .load(nearestPlace.image_for_scanning)
+            .into(object : CustomTarget<Bitmap>()
+            {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
+                {
+
+                    compressBitmapToStream(nearestPlace.id, resource)
+                    val modelUri = downloadModel(nearestPlace.model_for_ar)
+                    goToARActivity(nearestPlace.id, modelUri)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?)
+                {}
+            })
+    }
+
+    private fun goToARActivity(imageFilename: String, modelUri: Uri)
+    {
+        val arIntent = Intent(this, ARCameraActivity::class.java)
+        arIntent.putExtra("IMAGE_FOR_SCANNING", imageFilename)
+        arIntent.putExtra("MODEL_FOR_AR", modelUri.toString())
+        startActivity(arIntent)
+    }
+
     private fun compressBitmapToStream(filename: String, finalBitmap: Bitmap)
     {
         val stream = openFileOutput(filename, Context.MODE_PRIVATE)
@@ -162,12 +220,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         stream.close()
     }
 
-    fun downloadPdf(baseActivity:Context,url: String?,title: String?):Uri {
+    fun downloadModel(url: String?):Uri
+    {
 
-        val file = File(getExternalFilesDir(null),"Dummy3.glb")
+        val file = File(getExternalFilesDir(null),"model.glb")
         val request:DownloadManager.Request = DownloadManager.Request(Uri.parse(url))
-            .setTitle("Dummy")
-            .setDescription("Downloading")
+            .setTitle("Model")
+            .setDescription("ARTravelGuide")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             .setDestinationUri(Uri.fromFile(file))
             .setRequiresCharging(false)

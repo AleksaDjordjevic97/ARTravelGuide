@@ -68,36 +68,13 @@
 
 
     <ImageButton
-        android:id="@+id/btnUploadMP4"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/upload_mp4_btn"
-        android:scaleType="fitXY"
-        android:background="@android:color/transparent"
-        android:layout_marginStart="20dp"
-        app:layout_constraintStart_toEndOf="@+id/addPlaceNum2"
-        app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/momcake_thin"
-        android:text="OR"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/btnUploadMP4"
-        app:layout_constraintEnd_toStartOf="@+id/btnUploadGLB"
-        app:layout_constraintStart_toEndOf="@+id/btnUploadMP4"
-        app:layout_constraintTop_toTopOf="@+id/btnUploadMP4" />
-
-    <ImageButton
         android:id="@+id/btnUploadGLB"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/upload_glb_btn"
-        android:scaleType="fitXY"
         android:background="@android:color/transparent"
-        android:layout_marginStart="30dp"
-        app:layout_constraintStart_toEndOf="@+id/btnUploadMP4"
+        android:scaleType="fitXY"
+        android:src="@drawable/upload_glb_btn"
+        app:layout_constraintStart_toStartOf="@+id/txtLatAddPlace"
         app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
 
 

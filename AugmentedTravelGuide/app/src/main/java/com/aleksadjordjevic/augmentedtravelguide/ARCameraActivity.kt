@@ -39,29 +39,26 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
     OnSessionConfigurationListener, OnViewCreatedListener
 {
     private var arFragment: ArFragment? = null
-    private var matrixDetected = false
-    private var rabbitDetected = false
+//    private var matrixDetected = false
+//    private var rabbitDetected = false
     private var database: AugmentedImageDatabase? = null
-    private var plainVideoModel: Renderable? = null
-    private var plainVideoMaterial: Material? = null
-    private var mediaPlayer: MediaPlayer? = null
+//    private var plainVideoModel: Renderable? = null
+//    private var plainVideoMaterial: Material? = null
+//    private var mediaPlayer: MediaPlayer? = null
     private val futures: MutableList<CompletableFuture<*>> = ArrayList()
 
-    private lateinit var matrixImage:Bitmap
-    private lateinit var matrixModelURL:String
+    private lateinit var imageForScanning:Bitmap
+    private lateinit var modelURL:String
+    private var imageDetected = false
 
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_arcamera)
-        //        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
-//            ((ViewGroup.MarginLayoutParams) toolbar.getLayoutParams()).topMargin = insets.getSystemWindowInsetTop();
-//            return insets.consumeSystemWindowInsets();
-//        });
-        loadUserImageToFinal()
+
+        loadImageForScanning()
+        getModelURL()
 
         Handler(Looper.getMainLooper()).postDelayed({
 
@@ -78,29 +75,32 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
 
             // .glb models can be loaded at runtime when needed or when app starts
             // This method loads ModelRenderable when app starts
-            loadMatrixModel()
-            loadMatrixMaterial()
+//            loadMatrixModel()
+//            loadMatrixMaterial()
 
         }, 1)
 
 
     }
 
-    private fun loadUserImageToFinal()
+    private fun loadImageForScanning()
     {
-        val userImageFilename = intent.getStringExtra("USER_IMAGE_BITMAP_FILENAME")
-        val userImageURL = intent.getStringExtra("URL_MODEL")
+        val imageForScanningFilename = intent.getStringExtra("IMAGE_FOR_SCANNING")
         try
         {
-            val inputStream = this.openFileInput(userImageFilename)
-            matrixImage = BitmapFactory.decodeStream(inputStream)
-            matrixModelURL = userImageURL!!
+            val inputStream = this.openFileInput(imageForScanningFilename)
+            imageForScanning = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
 
         } catch (e: Exception)
         {
             e.printStackTrace()
         }
+    }
+
+    private fun getModelURL()
+    {
+        modelURL = intent.getStringExtra("MODEL_FOR_AR")!!
     }
 
     override fun onAttachFragment(fragmentManager: FragmentManager, fragment: Fragment)
@@ -124,11 +124,9 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
         // This is how database is created at runtime
         // You can also prebuild database in you computer and load it directly (see: https://developers.google.com/ar/develop/java/augmented-images/guide#database)
         database = AugmentedImageDatabase(session)
-      //  val matrixImage = BitmapFactory.decodeResource(resources, R.drawable.matrix)
-        val rabbitImage = BitmapFactory.decodeResource(resources, R.drawable.rabbit)
+
         // Every image has to have its own unique String identifier
-        database!!.addImage("matrix", matrixImage)
-        database!!.addImage("rabbit", rabbitImage)
+        database!!.addImage("imageForScanning", imageForScanning)
         config.augmentedImageDatabase = database
 
         // Check for image detection
@@ -164,86 +162,86 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
                 future.cancel(true)
             }
         }
-        if (mediaPlayer != null)
-        {
-            mediaPlayer!!.stop()
-            mediaPlayer!!.reset()
-        }
+//        if (mediaPlayer != null)
+//        {
+//            mediaPlayer!!.stop()
+//            mediaPlayer!!.reset()
+//        }
     }
 
-    private fun loadMatrixModel()
-    {
-        futures.add(
-            ModelRenderable.builder()
-             //   .setSource(this, Uri.parse("models/Video.glb"))
-                .setSource(this, Uri.parse("models/Video.glb"))
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept({ model: ModelRenderable ->
-                    //removing shadows for this Renderable
-                    model.setShadowCaster(false)
-                    model.setShadowReceiver(true)
-                    plainVideoModel = model
-                })
-                .exceptionally(
-                    { throwable: Throwable? ->
-                        Toast.makeText(this, "Unable to load renderable", Toast.LENGTH_LONG).show()
-                        null
-                    })
-        )
-    }
-
-    private fun loadMatrixMaterial()
-    {
-        val filamentEngine = EngineInstance.getEngine().filamentEngine
-        MaterialBuilder.init()
-        val materialBuilder = MaterialBuilder()
-            .platform(MaterialBuilder.Platform.MOBILE)
-            .name("External Video Material")
-            .require(MaterialBuilder.VertexAttribute.UV0)
-            .shading(MaterialBuilder.Shading.UNLIT)
-            .doubleSided(true)
-            .samplerParameter(
-                MaterialBuilder.SamplerType.SAMPLER_EXTERNAL,
-                MaterialBuilder.SamplerFormat.FLOAT,
-                MaterialBuilder.SamplerPrecision.DEFAULT,
-                "videoTexture"
-            )
-            .optimization(MaterialBuilder.Optimization.NONE)
-        val plainVideoMaterialPackage = materialBuilder
-            .blending(MaterialBuilder.BlendingMode.OPAQUE)
-            .material(
-                "void material(inout MaterialInputs material) {\n" +
-                        "    prepareMaterial(material);\n" +
-                        "    material.baseColor = texture(materialParams_videoTexture, getUV0()).rgba;\n" +
-                        "}\n"
-            )
-            .build(filamentEngine)
-        if (plainVideoMaterialPackage.isValid)
-        {
-            val buffer = plainVideoMaterialPackage.buffer
-            futures.add(
-                Material.builder()
-                    .setSource(buffer)
-                    .build()
-                    .thenAccept({ material: Material? ->
-                        plainVideoMaterial = material
-                    })
-                    .exceptionally(
-                        { throwable: Throwable? ->
-                            Toast.makeText(this, "Unable to load material", Toast.LENGTH_LONG)
-                                .show()
-                            null
-                        })
-            )
-        }
-        MaterialBuilder.shutdown()
-    }
+//    private fun loadMatrixModel()
+//    {
+//        futures.add(
+//            ModelRenderable.builder()
+//             //   .setSource(this, Uri.parse("models/Video.glb"))
+//                .setSource(this, Uri.parse(modelURL))
+//                .setIsFilamentGltf(true)
+//                .build()
+//                .thenAccept({ model: ModelRenderable ->
+//                    //removing shadows for this Renderable
+//                    model.setShadowCaster(false)
+//                    model.setShadowReceiver(true)
+//                    plainVideoModel = model
+//                })
+//                .exceptionally(
+//                    { throwable: Throwable? ->
+//                        Toast.makeText(this, "Unable to load renderable", Toast.LENGTH_LONG).show()
+//                        null
+//                    })
+//        )
+//    }
+//
+//    private fun loadMatrixMaterial()
+//    {
+//        val filamentEngine = EngineInstance.getEngine().filamentEngine
+//        MaterialBuilder.init()
+//        val materialBuilder = MaterialBuilder()
+//            .platform(MaterialBuilder.Platform.MOBILE)
+//            .name("External Video Material")
+//            .require(MaterialBuilder.VertexAttribute.UV0)
+//            .shading(MaterialBuilder.Shading.UNLIT)
+//            .doubleSided(true)
+//            .samplerParameter(
+//                MaterialBuilder.SamplerType.SAMPLER_EXTERNAL,
+//                MaterialBuilder.SamplerFormat.FLOAT,
+//                MaterialBuilder.SamplerPrecision.DEFAULT,
+//                "videoTexture"
+//            )
+//            .optimization(MaterialBuilder.Optimization.NONE)
+//        val plainVideoMaterialPackage = materialBuilder
+//            .blending(MaterialBuilder.BlendingMode.OPAQUE)
+//            .material(
+//                "void material(inout MaterialInputs material) {\n" +
+//                        "    prepareMaterial(material);\n" +
+//                        "    material.baseColor = texture(materialParams_videoTexture, getUV0()).rgba;\n" +
+//                        "}\n"
+//            )
+//            .build(filamentEngine)
+//        if (plainVideoMaterialPackage.isValid)
+//        {
+//            val buffer = plainVideoMaterialPackage.buffer
+//            futures.add(
+//                Material.builder()
+//                    .setSource(buffer)
+//                    .build()
+//                    .thenAccept({ material: Material? ->
+//                        plainVideoMaterial = material
+//                    })
+//                    .exceptionally(
+//                        { throwable: Throwable? ->
+//                            Toast.makeText(this, "Unable to load material", Toast.LENGTH_LONG)
+//                                .show()
+//                            null
+//                        })
+//            )
+//        }
+//        MaterialBuilder.shutdown()
+//    }
 
     fun onAugmentedImageTrackingUpdate(augmentedImage: AugmentedImage)
     {
         // If there are both images already detected, for better CPU usage we do not need scan for them
-        if (matrixDetected && rabbitDetected) return
+       // if (matrixDetected && rabbitDetected) return
         if ((augmentedImage.trackingState == TrackingState.TRACKING
                     && augmentedImage.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING)
         )
@@ -253,45 +251,45 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
             val anchorNode = AnchorNode(augmentedImage.createAnchor(augmentedImage.centerPose))
 
             // If matrix video haven't been placed yet and detected image has String identifier of "matrix"
-            if (!matrixDetected && (augmentedImage.name == "matrix"))
-            {
-                matrixDetected = true
-                Toast.makeText(this, "Matrix tag detected", Toast.LENGTH_LONG).show()
-
-                // AnchorNode placed to the detected tag and set it to the real size of the tag
-                // This will cause deformation if your AR tag has different aspect ratio than your video
-                anchorNode.worldScale = Vector3(augmentedImage.extentX, 1f, augmentedImage.extentZ)
-                arFragment!!.arSceneView.scene.addChild(anchorNode)
-                val videoNode = TransformableNode(arFragment!!.transformationSystem)
-                // For some reason it is shown upside down so this will rotate it correctly
-                videoNode.localRotation =
-                    Quaternion.axisAngle(Vector3(0f, 1f, 0f), 180f)
-                anchorNode.addChild(videoNode)
-
-                // Setting texture
-                val externalTexture = ExternalTexture()
-                val renderableInstance = videoNode.setRenderable(plainVideoModel)
-                renderableInstance.material = plainVideoMaterial
-
-                // Setting MediaPLayer
-                renderableInstance.material.setExternalTexture("videoTexture", externalTexture)
-                mediaPlayer = MediaPlayer.create(this, R.raw.matrix)
-                mediaPlayer!!.setLooping(true)
-                mediaPlayer!!.setSurface(externalTexture.surface)
-                mediaPlayer!!.start()
-            }
+//            if (!matrixDetected && (augmentedImage.name == "matrix"))
+//            {
+//                matrixDetected = true
+//                Toast.makeText(this, "Matrix tag detected", Toast.LENGTH_LONG).show()
+//
+//                // AnchorNode placed to the detected tag and set it to the real size of the tag
+//                // This will cause deformation if your AR tag has different aspect ratio than your video
+//                anchorNode.worldScale = Vector3(augmentedImage.extentX, 1f, augmentedImage.extentZ)
+//                arFragment!!.arSceneView.scene.addChild(anchorNode)
+//                val videoNode = TransformableNode(arFragment!!.transformationSystem)
+//                // For some reason it is shown upside down so this will rotate it correctly
+//                videoNode.localRotation =
+//                    Quaternion.axisAngle(Vector3(0f, 1f, 0f), 180f)
+//                anchorNode.addChild(videoNode)
+//
+//                // Setting texture
+//                val externalTexture = ExternalTexture()
+//                val renderableInstance = videoNode.setRenderable(plainVideoModel)
+//                renderableInstance.material = plainVideoMaterial
+//
+//                // Setting MediaPLayer
+//                renderableInstance.material.setExternalTexture("videoTexture", externalTexture)
+//                mediaPlayer = MediaPlayer.create(this, R.raw.matrix)
+//                mediaPlayer!!.setLooping(true)
+//                mediaPlayer!!.setSurface(externalTexture.surface)
+//                mediaPlayer!!.start()
+//            }
             // If rabbit model haven't been placed yet and detected image has String identifier of "rabbit"
             // This is also example of model loading and placing at runtime
-            if (!rabbitDetected && (augmentedImage.name == "rabbit"))
+            if (!imageDetected && (augmentedImage.name == "imageForScanning"))
             {
-                rabbitDetected = true
-                Toast.makeText(this, "Rabbit tag detected", Toast.LENGTH_LONG).show()
+                imageDetected = true
+                Toast.makeText(this, "Image detected", Toast.LENGTH_LONG).show()
                // anchorNode.worldScale = Vector3(3.5f, 3.5f, 3.5f)
                 anchorNode.worldScale = Vector3(1.5f, 1.5f, 1.5f)
                 arFragment!!.arSceneView.scene.addChild(anchorNode)
                 futures.add(
                     ModelRenderable.builder()
-                        .setSource(this, Uri.parse(matrixModelURL))
+                        .setSource(this, Uri.parse(modelURL))
                         .setIsFilamentGltf(true)
                         .build()
                         .thenAccept({ rabbitModel: ModelRenderable? ->
@@ -314,7 +312,7 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
                 )
             }
         }
-        if (matrixDetected && rabbitDetected)
+        if (imageDetected)
         {
             arFragment!!.instructionsController.setEnabled(
                 InstructionsController.TYPE_AUGMENTED_IMAGE_SCAN, false

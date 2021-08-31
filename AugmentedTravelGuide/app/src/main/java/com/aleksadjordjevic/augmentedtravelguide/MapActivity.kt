@@ -43,6 +43,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.File
+import com.google.android.gms.maps.model.Marker
+
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.SetOptions
+
 
 private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100
 
@@ -327,6 +333,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
            }
         }
 
+        mMap.setOnMarkerDragListener(object : OnMarkerDragListener
+        {
+            override fun onMarkerDragStart(marker: Marker)
+            {}
+
+            override fun onMarkerDragEnd(marker: Marker)
+            {
+                if(marker.snippet.startsWith("Click here to see more"))
+                {
+                    val index = marker.snippet.indexOf("ID:") + 3
+                    val placeID = marker.snippet.substring(index)
+                    val newGeoPoint = GeoPoint(marker.position.latitude,marker.position.longitude)
+                    val placeGeoPoint = hashMapOf("geoPoint" to newGeoPoint)
+                    Firebase.firestore.collection("places").document(placeID).set(placeGeoPoint, SetOptions.merge())
+                }
+            }
+
+            override fun onMarkerDrag(marker: Marker)
+            {}
+        })
+
+
     }
 
     private fun showPlaceDialog(placeID: String)
@@ -471,6 +499,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
             val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
             val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
                 BitmapDescriptorFactory.fromResource(R.drawable.ar_marker))
+
+            if(auth.currentUser != null)
+                if(place.guideID == auth.currentUser!!.uid)
+                    placeMarker.draggable(true).icon(
+                        BitmapDescriptorFactory.fromResource(R.drawable.ar_marker3))
+
             mMap.addMarker(placeMarker)
         }
     }

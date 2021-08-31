@@ -3,6 +3,7 @@ package com.aleksadjordjevic.augmentedtravelguide.fragments
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -18,8 +19,11 @@ import com.bumptech.glide.Glide
 import android.text.Editable
 
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -38,6 +42,9 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
     private var modelUriForAR:Uri? = null
     private var modelType:String = ""
 
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var lastKnownLocation: Location? = null
+
     private val galleryImageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     { result -> if (result.resultCode == Activity.RESULT_OK) setNewImage(result.data?.data)}
 
@@ -49,6 +56,8 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        getDeviceLocation()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -124,61 +133,6 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
     private fun setupTextChangeListeners()
     {
 
-        binding.txtLatAddPlace.addTextChangedListener(object : TextWatcher
-        {
-            override fun afterTextChanged(s: Editable)
-            {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int,
-                                           count: Int, after: Int)
-            {
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int,
-                                       before: Int, count: Int)
-            {
-
-                if(binding.txtLatAddPlace.text.trim().isEmpty() || binding.txtLngAddPlace.text.trim().isEmpty())
-                    binding.addPlaceNum3.setImageResource(R.drawable.number_3)
-                else
-                {
-                    if(binding.txtLatAddPlace.text.toString().toDouble() <= 90.0 && binding.txtLatAddPlace.text.toString().toDouble() >= -90.0 && binding.txtLngAddPlace.text.toString().toDouble() <= 180.0 && binding.txtLngAddPlace.text.toString().toDouble() >= -180.0)
-                        binding.addPlaceNum3.setImageResource(R.drawable.number_check)
-                    else
-                        binding.addPlaceNum3.setImageResource(R.drawable.number_3)
-                }
-            }
-        })
-
-        binding.txtLngAddPlace.addTextChangedListener(object : TextWatcher
-        {
-            override fun afterTextChanged(s: Editable)
-            {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int,
-                                           count: Int, after: Int)
-            {
-
-
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int,
-                                       before: Int, count: Int)
-            {
-                if(binding.txtLatAddPlace.text.trim().isEmpty() || binding.txtLngAddPlace.text.trim().isEmpty())
-                    binding.addPlaceNum3.setImageResource(R.drawable.number_3)
-                else
-                {
-                    if(binding.txtLatAddPlace.text.toString().toDouble() <= 90.0 && binding.txtLatAddPlace.text.toString().toDouble() >= -90.0 && binding.txtLngAddPlace.text.toString().toDouble() <= 180.0 && binding.txtLngAddPlace.text.toString().toDouble() >= -180.0)
-                        binding.addPlaceNum3.setImageResource(R.drawable.number_check)
-                    else
-                        binding.addPlaceNum3.setImageResource(R.drawable.number_3)
-                }
-            }
-        })
-
         binding.txtNameAddPlace.addTextChangedListener(object : TextWatcher
         {
             override fun afterTextChanged(s: Editable)
@@ -194,9 +148,9 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
                                        before: Int, count: Int)
             {
                if(binding.txtNameAddPlace.text.trim().isEmpty())
-                   binding.addPlaceNum4.setImageResource(R.drawable.number_4)
+                   binding.addPlaceNum3.setImageResource(R.drawable.number_3)
                 else
-                   binding.addPlaceNum4.setImageResource(R.drawable.number_check)
+                   binding.addPlaceNum3.setImageResource(R.drawable.number_check)
             }
         })
 
@@ -215,9 +169,9 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
                                        before: Int, count: Int)
             {
                 if(binding.txtDescriptionAddPlace.text.trim().isEmpty())
-                    binding.addPlaceNum5.setImageResource(R.drawable.number_5)
+                    binding.addPlaceNum4.setImageResource(R.drawable.number_4)
                 else
-                    binding.addPlaceNum5.setImageResource(R.drawable.number_check)
+                    binding.addPlaceNum4.setImageResource(R.drawable.number_check)
             }
         })
 
@@ -243,14 +197,34 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
             binding.addPlaceNum1.setImageResource(R.drawable.number_1)
     }
 
+    private fun getDeviceLocation()
+    {
+        try
+        {
+            val locationResult = fusedLocationProviderClient.lastLocation
+            locationResult.addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful)
+                    lastKnownLocation = task.result
+            }
+        }catch (e: SecurityException)
+        {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
     private fun createNewPlace()
     {
         if(checkIfAllIsFilled())
         {
+            val markerGeoPoint = if(lastKnownLocation != null)
+                GeoPoint(lastKnownLocation!!.latitude,lastKnownLocation!!.longitude)
+            else
+                GeoPoint(43.304,21.9)
+
             val place = hashMapOf("guideID" to guideID,
                                     "name" to binding.txtNameAddPlace.text.toString().trim(),
                                     "description" to binding.txtDescriptionAddPlace.text.toString().trim(),
-                                    "geoPoint" to GeoPoint(binding.txtLatAddPlace.text.toString().toDouble(),binding.txtLngAddPlace.text.toString().toDouble()))
+                                    "geoPoint" to markerGeoPoint)
 
             val addedDocRef = Firebase.firestore.collection("places").add(place)
 
@@ -291,8 +265,7 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
 
     private fun checkIfAllIsFilled():Boolean
     {
-        return photoUriForNewPhoto != null && modelUriForAR != null && binding.txtNameAddPlace.text.trim().isNotEmpty() && binding.txtDescriptionAddPlace.text.trim().isNotEmpty() && binding.txtLatAddPlace.text.trim().isNotEmpty() && binding.txtLngAddPlace.text.trim().isNotEmpty()
-                && binding.txtLatAddPlace.text.toString().toDouble() <= 90.0 && binding.txtLatAddPlace.text.toString().toDouble() >= -90.0 && binding.txtLngAddPlace.text.toString().toDouble() <= 180.0 && binding.txtLngAddPlace.text.toString().toDouble() >= -180.0
+        return photoUriForNewPhoto != null && modelUriForAR != null && binding.txtNameAddPlace.text.trim().isNotEmpty() && binding.txtDescriptionAddPlace.text.trim().isNotEmpty()
     }
 
     private fun updatePlaceInDB(placeID:String,field:HashMap<String,String>)

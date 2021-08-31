@@ -84,58 +84,14 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
         Glide.with(this).load(place.image_for_scanning).into(binding.guidePlacesFragmentImage)
         binding.guidePlacesFragmentName.setText(place.name)
         binding.guidePlacesFragmentDescription.setText(place.description)
-        binding.guidePlacesFragmentLat.setText(place.geoPoint.latitude.toString())
-        binding.guidePlacesFragmentLng.setText(place.geoPoint.longitude.toString())
 
         binding.btnGuidePlacesFragmentClose.setOnClickListener { dismiss() }
         binding.btnGuidePlacesFragmentSave.setOnClickListener { saveChanges() }
         binding.guidePlacesFragmentImage.setOnClickListener { openGallery() }
 
-        setupTextChangeListeners()
     }
 
-    private fun setupTextChangeListeners()
-    {
 
-        binding.guidePlacesFragmentLat.addTextChangedListener(object : TextWatcher
-        {
-            override fun afterTextChanged(s: Editable)
-            {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int,
-                                           count: Int, after: Int)
-            {
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int,
-                                       before: Int, count: Int)
-            {
-                latLngCorrect = binding.guidePlacesFragmentLat.text.toString().toDouble() <= 90.0 && binding.guidePlacesFragmentLat.text.toString().toDouble() >= -90.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() <= 180.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() >= -180.0
-            }
-        })
-
-        binding.guidePlacesFragmentLng.addTextChangedListener(object : TextWatcher
-        {
-            override fun afterTextChanged(s: Editable)
-            {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int,
-                                           count: Int, after: Int)
-            {
-
-
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int,
-                                       before: Int, count: Int)
-            {
-                latLngCorrect = binding.guidePlacesFragmentLat.text.toString().toDouble() <= 90.0 && binding.guidePlacesFragmentLat.text.toString().toDouble() >= -90.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() <= 180.0 && binding.guidePlacesFragmentLng.text.toString().toDouble() >= -180.0
-            }
-        })
-
-    }
 
     private fun openGallery()
     {
@@ -160,7 +116,6 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
         {
             if(latLngCorrect)
             {
-                val geoPoint = GeoPoint(binding.guidePlacesFragmentLat.text.toString().toDouble(),binding.guidePlacesFragmentLng.text.toString().toDouble())
                 if (photoUriForNewPhoto != null)
                 {
                     val filepath =
@@ -172,9 +127,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
 
                             place.image_for_scanning = uri.toString()
                             place.name = binding.guidePlacesFragmentName.text.toString()
-                            place.description =
-                                binding.guidePlacesFragmentDescription.text.toString()
-                            place.geoPoint = geoPoint
+                            place.description = binding.guidePlacesFragmentDescription.text.toString()
 
                             updatePlaceInDB()
                         }
@@ -184,7 +137,6 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
                 {
                     place.name = binding.guidePlacesFragmentName.text.toString()
                     place.description = binding.guidePlacesFragmentDescription.text.toString()
-                    place.geoPoint = geoPoint
 
                     updatePlaceInDB()
                 }
@@ -200,7 +152,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
 
     private fun checkIfNoEmptyFields():Boolean
     {
-        return binding.guidePlacesFragmentLat.text.isNotEmpty() && binding.guidePlacesFragmentLng.text.isNotEmpty() &&binding.guidePlacesFragmentName.text.isNotEmpty() && binding.guidePlacesFragmentDescription.text.isNotEmpty()
+        return binding.guidePlacesFragmentName.text.isNotEmpty() && binding.guidePlacesFragmentDescription.text.isNotEmpty()
     }
 
     private fun updatePlaceInDB()

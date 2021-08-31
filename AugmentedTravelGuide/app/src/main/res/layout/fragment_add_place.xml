@@ -74,7 +74,8 @@
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
         android:src="@drawable/upload_glb_btn"
-        app:layout_constraintStart_toStartOf="@+id/txtLatAddPlace"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum2"
+        app:layout_constraintStart_toStartOf="@+id/txtNameAddPlace"
         app:layout_constraintTop_toTopOf="@+id/addPlaceNum2" />
 
 
@@ -106,32 +107,18 @@
 
 
     <EditText
-        android:id="@+id/txtLatAddPlace"
-        android:layout_width="90dp"
+        android:id="@+id/txtNameAddPlace"
+        android:layout_width="300dp"
         android:layout_height="40dp"
+        android:backgroundTint="@color/black"
         android:fontFamily="@font/momcake_bold"
-        android:hint="Lat"
-        android:inputType="numberSigned|numberDecimal"
+        android:hint="Name"
         android:textColor="@color/black"
         android:textColorHint="@color/light_gray"
         app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum3"
-        app:layout_constraintStart_toStartOf="@+id/txtNameAddPlace"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addPlaceNum3"
         app:layout_constraintTop_toTopOf="@+id/addPlaceNum3" />
-
-    <EditText
-        android:id="@+id/txtLngAddPlace"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="50dp"
-        android:fontFamily="@font/momcake_bold"
-        android:hint="Lng"
-        android:inputType="numberSigned|numberDecimal"
-        android:textColor="@color/black"
-        android:textColorHint="@color/light_gray"
-        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum3"
-        app:layout_constraintStart_toEndOf="@+id/txtLatAddPlace"
-        app:layout_constraintTop_toTopOf="@+id/addPlaceNum3" />
-
 
 
     <ImageView
@@ -146,47 +133,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addPlaceNum3" />
 
-    <EditText
-        android:id="@+id/txtNameAddPlace"
-        android:layout_width="300dp"
-        android:layout_height="40dp"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/black"
-        android:hint="Name"
-        android:textColorHint="@color/light_gray"
-        android:fontFamily="@font/momcake_bold"
-        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addPlaceNum4"
-        app:layout_constraintTop_toTopOf="@+id/addPlaceNum4" />
-
-
-    <ImageView
-        android:id="@+id/addPlaceNum5"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="40dp"
-        android:background="@android:color/transparent"
-        android:scaleType="fitXY"
-        android:src="@drawable/number_5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addPlaceNum4" />
 
     <EditText
         android:id="@+id/txtDescriptionAddPlace"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
         android:backgroundTint="@color/black"
+        android:fontFamily="@font/momcake_thin"
         android:hint="Description"
-        android:textColorHint="@color/light_gray"
         android:inputType="textMultiLine"
         android:maxLines="3"
-        android:fontFamily="@font/momcake_thin"
+        android:textColor="@color/black"
+        android:textColorHint="@color/light_gray"
+        app:layout_constraintBottom_toBottomOf="@+id/addPlaceNum4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addPlaceNum5"
-        app:layout_constraintTop_toTopOf="@+id/addPlaceNum5" />
+        app:layout_constraintStart_toEndOf="@+id/addPlaceNum4"
+        app:layout_constraintTop_toTopOf="@+id/addPlaceNum4" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAddPlace"

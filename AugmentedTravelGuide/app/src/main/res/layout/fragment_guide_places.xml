@@ -31,32 +31,6 @@
 
 
     <EditText
-        android:id="@+id/guidePlacesFragmentLat"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
-        android:fontFamily="@font/momcake_bold"
-        android:hint="Lat"
-        android:inputType="numberSigned|numberDecimal"
-        android:textColor="@color/black"
-        android:textColorHint="@color/light_gray"
-        android:layout_marginTop="30dp"
-        app:layout_constraintStart_toStartOf="@+id/guidePlacesFragmentImage"
-        app:layout_constraintTop_toBottomOf="@+id/guidePlacesFragmentImage" />
-
-    <EditText
-        android:id="@+id/guidePlacesFragmentLng"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
-        android:fontFamily="@font/momcake_bold"
-        android:hint="Lng"
-        android:inputType="numberSigned|numberDecimal"
-        android:textColor="@color/black"
-        android:textColorHint="@color/light_gray"
-        android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="@+id/guidePlacesFragmentImage"
-        app:layout_constraintTop_toBottomOf="@+id/guidePlacesFragmentImage" />
-
-    <EditText
         android:id="@+id/guidePlacesFragmentName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -67,10 +41,10 @@
         android:textColor="@color/black"
         android:textColorHint="@color/light_gray"
         android:textSize="30sp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guidePlacesFragmentLat"
+        app:layout_constraintTop_toBottomOf="@+id/guidePlacesFragmentImage"
         app:layout_constraintWidth_percent="0.8" />
 
     <EditText

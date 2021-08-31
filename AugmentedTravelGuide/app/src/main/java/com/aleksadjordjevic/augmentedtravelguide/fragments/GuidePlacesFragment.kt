@@ -32,11 +32,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
     private var _binding: FragmentGuidePlacesBinding? = null
     private val binding get() = _binding!!
 
-
-    private lateinit var guidePlacesAdapter:GuidePlaceAdapter
-    private var placesList = ArrayList<Place>()
     private var photoUriForNewPhoto:Uri? = null
-    private var latLngCorrect = true
 
     private val galleryImageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     { result -> if (result.resultCode == Activity.RESULT_OK) setNewImage(result.data?.data)}
@@ -114,36 +110,31 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
     {
         if(checkIfNoEmptyFields())
         {
-            if(latLngCorrect)
+
+            if (photoUriForNewPhoto != null)
             {
-                if (photoUriForNewPhoto != null)
-                {
-                    val filepath =
-                        FirebaseStorage.getInstance().reference.child("images_for_scanning")
-                            .child("${place.id}.jpeg")
-                    filepath.putFile(photoUriForNewPhoto!!).addOnSuccessListener { taskSnapshot ->
+                val filepath =
+                    FirebaseStorage.getInstance().reference.child("images_for_scanning")
+                        .child("${place.id}.jpeg")
+                filepath.putFile(photoUriForNewPhoto!!).addOnSuccessListener { taskSnapshot ->
 
-                        filepath.downloadUrl.addOnSuccessListener { uri ->
+                    filepath.downloadUrl.addOnSuccessListener { uri ->
 
-                            place.image_for_scanning = uri.toString()
-                            place.name = binding.guidePlacesFragmentName.text.toString()
-                            place.description = binding.guidePlacesFragmentDescription.text.toString()
+                        place.image_for_scanning = uri.toString()
+                        place.name = binding.guidePlacesFragmentName.text.toString()
+                        place.description = binding.guidePlacesFragmentDescription.text.toString()
 
-                            updatePlaceInDB()
-                        }
+                        updatePlaceInDB()
                     }
-                }
-                else
-                {
-                    place.name = binding.guidePlacesFragmentName.text.toString()
-                    place.description = binding.guidePlacesFragmentDescription.text.toString()
-
-                    updatePlaceInDB()
                 }
             }
             else
-                Toast.makeText(requireContext(),"Latitude must be between -90 and 90; Longitude must be between -180 and 180",Toast.LENGTH_SHORT).show()
+            {
+                place.name = binding.guidePlacesFragmentName.text.toString()
+                place.description = binding.guidePlacesFragmentDescription.text.toString()
 
+                updatePlaceInDB()
+            }
         }
         else
             Toast.makeText(requireContext(),"Make sure you typed in all fields",Toast.LENGTH_SHORT).show()

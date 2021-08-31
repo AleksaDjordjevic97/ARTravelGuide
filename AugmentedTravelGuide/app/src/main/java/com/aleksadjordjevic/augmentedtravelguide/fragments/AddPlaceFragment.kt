@@ -256,6 +256,7 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
                         }
                     }
 
+                    dismiss()
                 }
             }
 
@@ -270,13 +271,7 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
 
     private fun updatePlaceInDB(placeID:String,field:HashMap<String,String>)
     {
-        Firebase.firestore.collection("places").document(placeID).set(field, SetOptions.merge()).addOnCompleteListener { task->
-
-            if(task.isSuccessful)
-                Toast.makeText(requireContext(),"Changes made successfully!",Toast.LENGTH_SHORT).show()
-            else
-                Toast.makeText(requireContext(),"Changes failed. Try again later",Toast.LENGTH_SHORT).show()
-        }
+        Firebase.firestore.collection("places").document(placeID).set(field, SetOptions.merge())
     }
 
 

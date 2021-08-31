@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -111,44 +112,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private fun setupOnClickListeners()
     {
         binding.fabARView.setOnClickListener {
-
-
-//            Firebase.firestore.collection("places").document("9Dbfb6Hbxy2oI21wDwfC").get().addOnCompleteListener { task->
-//                if(task.isSuccessful)
-//                {
-//                    val imageURL = task.result.getString("image_for_scanning")
-//
-//
-//
-//                    Glide.with(this)
-//                        .asBitmap()
-//                        .load(imageURL)
-//                        .into(object : CustomTarget<Bitmap>(){
-//                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-//
-//                                compressBitmapToStream("bitmap.png", resource)
-//                                val uri = downloadPdf(this@MapActivity,task.result.getString("model_for_ar"),"bla")
-//                                val arIntent = Intent(this@MapActivity, ARCameraActivity::class.java)
-//                                arIntent.putExtra("USER_IMAGE_BITMAP_FILENAME", "bitmap.png")
-//                                arIntent.putExtra("URL_MODEL",uri.toString())
-//                                startActivity(arIntent)
-//
-//
-//                            }
-//                            override fun onLoadCleared(placeholder: Drawable?) {
-//                                // this is called when imageView is cleared on lifecycle call or for
-//                                // some other reason.
-//                                // if you are referencing the bitmap somewhere else too other than this imageView
-//                                // clear it here as you can no longer have the bitmap
-//                            }
-//                        })
-//                }
-//            }
-
-
+            deleteOldModels()
             getNearestPlaceToUser()
-
-
         }
 
         binding.fabAddPlace.setOnClickListener {
@@ -157,6 +122,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
         binding.btnOpenNavView.setOnClickListener {
             binding.drawerLayoutMap.openDrawer(Gravity.LEFT)
+        }
+    }
+
+    private fun deleteOldModels()
+    {
+        try
+        {
+            val file = File(getExternalFilesDir(null)!!.path,"model.glb")
+            if(file.exists())
+            {
+                file.delete()
+            }
+        } catch (e: java.lang.Exception)
+        {
+            e.printStackTrace()
         }
     }
 

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
+import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityAractivityBinding
 import com.bumptech.glide.Glide
 import com.google.android.filament.ColorGrading
 import com.google.android.filament.filamat.MaterialBuilder
@@ -38,6 +39,7 @@ import java.util.concurrent.CompletableFuture
 class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
     OnSessionConfigurationListener, OnViewCreatedListener
 {
+    private lateinit var binding:ActivityAractivityBinding
     private var arFragment: ArFragment? = null
 //    private var matrixDetected = false
 //    private var rabbitDetected = false
@@ -55,7 +57,8 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_arcamera)
+        binding = ActivityAractivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         loadImageForScanning()
         getModelURL()
@@ -90,6 +93,7 @@ class ARCameraActivity() : AppCompatActivity(), FragmentOnAttachListener,
         {
             val inputStream = this.openFileInput(imageForScanningFilename)
             imageForScanning = BitmapFactory.decodeStream(inputStream)
+            binding.imgForScaningAR.setImageBitmap(imageForScanning)
             inputStream.close()
 
         } catch (e: Exception)

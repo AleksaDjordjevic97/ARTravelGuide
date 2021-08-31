@@ -28,8 +28,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityMapBinding
 import com.aleksadjordjevic.augmentedtravelguide.fragments.AddPlaceFragment
 import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFragment
@@ -40,6 +38,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -314,6 +313,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     override fun onMapReady(googleMap: GoogleMap)
     {
         mMap = googleMap
+        getLocationPermission()
         updateLocationUI()
         getDeviceLocation()
         getPlacesListFromDB()
@@ -399,6 +399,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         }
     }
 
+
+    private fun animateCameraToLocation(location: Location)
+    {
+        val bottomBoundary = location.latitude - .1
+        val leftBoundary = location.longitude - .1
+        val topBoundary = location.latitude + .1
+        val rightBoundary = location.longitude + .1
+        val mMapBoundary = LatLngBounds(LatLng(bottomBoundary, leftBoundary), LatLng(topBoundary, rightBoundary))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0))
+    }
+
     private fun getDeviceLocation()
     {
         try
@@ -412,30 +423,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
                         lastKnownLocation = task.result
                         if (lastKnownLocation != null)
                         {
-                            mMap.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(
-                                        lastKnownLocation!!.latitude,
-                                        lastKnownLocation!!.longitude
-                                    ), 50f
-                                )
-                            )
-                            val myLocation = LatLng(
-                                lastKnownLocation!!.latitude,
-                                lastKnownLocation!!.longitude
-                            )
-                            mMap.addMarker(
-                                MarkerOptions().position(myLocation).title("My location")
-                            )
+                            animateCameraToLocation(lastKnownLocation!!)
                         }
                     }
                     else
                     {
-                        val nisLocation = LatLng(43.304, 21.9)
-                        mMap.moveCamera(
-                            CameraUpdateFactory
-                                .newLatLngZoom(nisLocation, 50f)
-                        )
+                        val nisLocation = Location("Nis")
+                        nisLocation.latitude = 43.304
+                        nisLocation.longitude = 21.9
+                        animateCameraToLocation(nisLocation)
                         mMap.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
@@ -473,7 +469,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         for(place in placesList)
         {
             val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
-            val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}")
+            val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
+                BitmapDescriptorFactory.fromResource(R.drawable.ar_marker))
             mMap.addMarker(placeMarker)
         }
     }

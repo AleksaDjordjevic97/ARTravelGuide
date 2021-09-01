@@ -2,13 +2,12 @@ package com.aleksadjordjevic.augmentedtravelguide
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.adapters.GuidePlaceAdapter
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityGuidePlacesBinding
 import com.aleksadjordjevic.augmentedtravelguide.fragments.GuidePlacesFragment
-import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFragment
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -17,6 +16,7 @@ class GuidePlacesActivity : AppCompatActivity(),GuidePlaceAdapter.OnGuidePlaceLi
     private lateinit var binding:ActivityGuidePlacesBinding
 
     private lateinit var auth:FirebaseAuth
+    private lateinit var placesListener: ListenerRegistration
 
     private lateinit var guidePlacesAdapter: GuidePlaceAdapter
     private var placesList = ArrayList<Place>()
@@ -33,9 +33,15 @@ class GuidePlacesActivity : AppCompatActivity(),GuidePlaceAdapter.OnGuidePlaceLi
         getAllPlacesForThisGuide()
     }
 
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        placesListener.remove()
+    }
+
     private fun getAllPlacesForThisGuide()
     {
-        Firebase.firestore.collection("places").whereEqualTo("guideID",auth.currentUser!!.uid).addSnapshotListener { value, e ->
+        placesListener =  Firebase.firestore.collection("places").whereEqualTo("guideID",auth.currentUser!!.uid).addSnapshotListener { value, e ->
             if (e != null)
                 return@addSnapshotListener
 

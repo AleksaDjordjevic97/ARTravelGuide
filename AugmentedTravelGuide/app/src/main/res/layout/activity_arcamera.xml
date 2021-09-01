@@ -2,18 +2,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ARCameraActivity">
+    tools:context=".MainActivity">
+
+
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/arFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!--    <androidx.appcompat.widget.Toolbar-->
-    <!--        android:id="@+id/toolbar"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="?actionBarSize"-->
-    <!--        android:minHeight="?attr/actionBarSize"-->
-    <!--        android:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar" />-->
+    <ImageView
+        android:id="@+id/imgForScaningAR"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_gravity="end"/>
 
 </FrameLayout>

@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
-import com.aleksadjordjevic.augmentedtravelguide.MapActivity
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityRegister2Binding
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -27,7 +26,7 @@ class Register2Activity : AppCompatActivity()
     private lateinit var profileImagesStorageRef:StorageReference
     private lateinit var userDocumentRef:DocumentReference
 
-    private val galleryImageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    private val galleryImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     { result -> if (result.resultCode == Activity.RESULT_OK) setProfilePhoto(result.data?.data)}
 
 
@@ -46,7 +45,7 @@ class Register2Activity : AppCompatActivity()
     private fun setupOnClickListeners()
     {
         binding.btnContinueRegister2.setOnClickListener {
-            if(checkInputError())
+            if(hasNoInputErrors())
             {
                 writeNameAndPhoneToDatabase()
                 sendToMap()
@@ -59,25 +58,33 @@ class Register2Activity : AppCompatActivity()
     }
 
 
-    private fun checkInputError(): Boolean
+    private fun hasNoInputErrors(): Boolean
     {
+        val name = binding.txtOrganizationNameRegister2.text.toString().trim()
         val phone = binding.txtPhoneRegister2.text.toString().trim()
 
-        return if(phone.isNotEmpty() && phone[0] != '+')
+        if(name.isEmpty())
+        {
+            binding.txtOrganizationNameRegister2.error = "You need to enter an organization name"
+            binding.txtOrganizationNameRegister2.requestFocus()
+            return false
+        }
+
+        if(phone.isNotEmpty() && phone[0] != '+')
         {
             binding.txtPhoneRegister2.error = "The phone number must start with +"
             binding.txtPhoneRegister2.requestFocus()
-            false
+            return false
         }
-        else
-            true
+
+        return true
     }
 
 
     private fun openGallery()
     {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryImageResult.launch(galleryIntent)
+        galleryImageLauncher.launch(galleryIntent)
     }
 
     private fun setProfilePhoto(photoUri: Uri?)

@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 
 class LoginActivity : AppCompatActivity()
 {
@@ -22,9 +23,8 @@ class LoginActivity : AppCompatActivity()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = Firebase.auth
-
         setupOnClickListeners()
+        auth = Firebase.auth
     }
 
     private fun setupOnClickListeners()
@@ -38,48 +38,28 @@ class LoginActivity : AppCompatActivity()
         }
 
         binding.txtSignUp.setOnClickListener {
-            val loginIntent = Intent(this, RegisterActivity::class.java)
-            startActivity(loginIntent)
-            finish()
+            sendToRegister()
         }
     }
 
     private fun loginUser()
     {
-        if(checkInputError())
+        if(hasNoInputErrors())
         {
             val email = binding.txtEmailLogin.text.toString()
             val password = binding.txtPasswordLogin.text.toString()
+
             auth.signInWithEmailAndPassword(email,password).addOnCompleteListener { task ->
+
                 if (task.isSuccessful)
-                {
-                    Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_SHORT)
-                        .show()
-
-                    sendToMap()
-                }
+                    onLoginSuccessful()
                 else
-                {
-
-                    if(task.exception is FirebaseAuthInvalidCredentialsException)
-                        Toast.makeText(
-                            applicationContext,
-                            "Wrong password",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    else
-                        Toast.makeText(
-                            applicationContext,
-                            "There was an error logging in. Make sure a user with these credentials exists",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                }
+                    task.exception?.let { onLoginFailed(it) }
             }
         }
     }
 
-    private fun checkInputError(): Boolean
+    private fun hasNoInputErrors(): Boolean
     {
         if (binding.txtEmailLogin.text.isEmpty())
         {
@@ -100,6 +80,36 @@ class LoginActivity : AppCompatActivity()
             return false
         }
         return true
+    }
+
+    private fun onLoginSuccessful()
+    {
+        Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_SHORT).show()
+        sendToMap()
+    }
+
+    private fun onLoginFailed(exception: Exception)
+    {
+        if(exception is FirebaseAuthInvalidCredentialsException)
+            Toast.makeText(
+                applicationContext,
+                "Wrong password",
+                Toast.LENGTH_SHORT
+            ).show()
+        else
+            Toast.makeText(
+                applicationContext,
+                "There was an error logging in. Make sure a user with these credentials exists",
+                Toast.LENGTH_SHORT
+            ).show()
+
+    }
+
+    private fun sendToRegister()
+    {
+        val loginIntent = Intent(this, RegisterActivity::class.java)
+        startActivity(loginIntent)
+        finish()
     }
 
     private fun sendToMap()

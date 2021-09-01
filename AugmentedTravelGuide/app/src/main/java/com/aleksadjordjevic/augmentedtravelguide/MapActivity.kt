@@ -15,15 +15,14 @@ import android.location.LocationListener
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -48,6 +47,7 @@ import com.google.android.gms.maps.model.Marker
 
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 
 
@@ -60,6 +60,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
 
     private lateinit var auth:FirebaseAuth
+    private lateinit var navViewHeaderListener:ListenerRegistration
 
     private lateinit var mMap: GoogleMap
     private var locationPermissionGranted = false
@@ -67,8 +68,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private var lastKnownLocation: Location? = null
 
     private var placesList = ArrayList<Place>()
-
-     var downloadID:Long = 0L
+    private var downloadID:Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -80,32 +80,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         mapFragment.getMapAsync(this)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-
-        setupNavView()
         setupOnClickListeners()
+        setupNavView()
 
         auth = FirebaseAuth.getInstance()
         if(auth.currentUser == null)
-        {
-            binding.fabAddPlace.visibility = View.INVISIBLE
-            binding.btnOpenNavView.visibility = View.INVISIBLE
-            binding.drawerLayoutMap.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        }
+            hideNavView()
         else
             setupNavViewHeader()
 
 
-        var br = object:BroadcastReceiver(){
-            override fun onReceive(p0: Context?, p1: Intent?)
-            {
-                var id = p1?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1)
-                if(id==downloadID)
-                    Toast.makeText(this@MapActivity,"Download completed",Toast.LENGTH_LONG).show()
-            }
+        registerReceiverForModelDownloads()
 
-        }
-        registerReceiver(br, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+    }
 
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        navViewHeaderListener.remove()
     }
 
     @SuppressLint("RtlHardcoded")
@@ -123,6 +115,311 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         binding.btnOpenNavView.setOnClickListener {
             binding.drawerLayoutMap.openDrawer(Gravity.LEFT)
         }
+    }
+
+    private fun setupNavView()
+    {
+        actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerLayoutMap,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        binding.drawerLayoutMap.addDrawerListener(actionBarDrawerToggle!!)
+        actionBarDrawerToggle!!.syncState()
+        binding.navViewGuide.setNavigationItemSelectedListener{ menuItem ->
+            userMenuSelector(menuItem)
+            false
+        }
+
+    }
+
+    private fun setupNavViewHeader()
+    {
+        navViewHeaderListener = Firebase.firestore.collection("users").document(auth.currentUser!!.uid).addSnapshotListener { value, e ->
+            if (e != null)
+                return@addSnapshotListener
+
+            val user = value!!.toObject(User::class.java)
+            if(user!!.profile_image != "")
+                Glide.with(this).load(user!!.profile_image)
+                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
+            else
+                Glide.with(this).load(R.drawable.user)
+                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
+            binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
+                user.organization_name
+            binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
+        }
+    }
+
+    private fun hideNavView()
+    {
+        binding.fabAddPlace.visibility = View.INVISIBLE
+        binding.btnOpenNavView.visibility = View.INVISIBLE
+        binding.drawerLayoutMap.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        return if(actionBarDrawerToggle != null)
+        {
+            if (actionBarDrawerToggle!!.onOptionsItemSelected(item))
+            {
+                true
+            }
+            else super.onOptionsItemSelected(item)
+        }
+        else super.onOptionsItemSelected(item)
+    }
+
+    fun userMenuSelector(item: MenuItem)
+    {
+        when (item.itemId)
+        {
+            R.id.nav_profile ->
+            {
+                val profileIntent = Intent(this, GuideProfileActivity::class.java)
+                startActivity(profileIntent)
+            }
+            R.id.nav_places ->
+            {
+                val placesIntent = Intent(this, GuidePlacesActivity::class.java)
+                startActivity(placesIntent)
+            }
+            R.id.nav_signout ->
+            {
+                auth.signOut()
+                finish()
+            }
+        }
+    }
+
+    private fun registerReceiverForModelDownloads()
+    {
+        var br = object:BroadcastReceiver(){
+            override fun onReceive(p0: Context?, p1: Intent?)
+            {
+                var id = p1?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1)
+                if(id==downloadID)
+                    Toast.makeText(this@MapActivity,"Download completed",Toast.LENGTH_LONG).show()
+            }
+
+        }
+        registerReceiver(br, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+    }
+
+    override fun onMapReady(googleMap: GoogleMap)
+    {
+        mMap = googleMap
+        getLocationPermission()
+        showMyLocationOnMap()
+        getDeviceLocation()
+        getPlacesListFromDB()
+
+        mMap.setOnInfoWindowClickListener { marker ->
+            if(marker.snippet != null)
+            {
+                if (marker.snippet!!.startsWith("Click here to see more"))
+                {
+                    val index = marker.snippet!!.indexOf("ID:") + 3
+                    val placeID = marker.snippet!!.substring(index)
+                    showPlaceDialog(placeID)
+                }
+            }
+        }
+
+        mMap.setOnMarkerDragListener(object : OnMarkerDragListener
+        {
+            override fun onMarkerDragStart(marker: Marker)
+            {}
+
+            override fun onMarkerDragEnd(marker: Marker)
+            {
+                if(marker.snippet != null)
+                {
+                    if (marker.snippet!!.startsWith("Click here to see more"))
+                    {
+                        val index = marker.snippet!!.indexOf("ID:") + 3
+                        val placeID = marker.snippet!!.substring(index)
+                        val newGeoPoint =
+                            GeoPoint(marker.position.latitude, marker.position.longitude)
+                        val placeGeoPoint = hashMapOf("geoPoint" to newGeoPoint)
+                        Firebase.firestore.collection("places").document(placeID)
+                            .set(placeGeoPoint, SetOptions.merge())
+                    }
+                }
+            }
+
+            override fun onMarkerDrag(marker: Marker)
+            {}
+        })
+
+
+    }
+
+    private fun getLocationPermission()
+    {
+        if (ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        )
+        {
+            locationPermissionGranted = true
+        }
+        else
+        {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray)
+    {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissionGranted = false
+
+        when (requestCode)
+        {
+            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION ->
+            {
+
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    locationPermissionGranted = true
+
+            }
+        }
+        showMyLocationOnMap()
+    }
+
+    private fun showMyLocationOnMap()
+    {
+        try
+        {
+            if (locationPermissionGranted)
+            {
+                mMap.isMyLocationEnabled = true
+                mMap.uiSettings.isMyLocationButtonEnabled = true
+            }
+            else
+            {
+                mMap.isMyLocationEnabled = false
+                mMap.uiSettings.isMyLocationButtonEnabled = false
+                lastKnownLocation = null
+                getLocationPermission()
+            }
+        } catch (e: SecurityException)
+        {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+
+    private fun animateCameraToLocation(location: Location)
+    {
+        val bottomBoundary = location.latitude - .1
+        val leftBoundary = location.longitude - .1
+        val topBoundary = location.latitude + .1
+        val rightBoundary = location.longitude + .1
+        val mMapBoundary = LatLngBounds(LatLng(bottomBoundary, leftBoundary), LatLng(topBoundary, rightBoundary))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0))
+    }
+
+    private fun getDeviceLocation()
+    {
+        try
+        {
+            if (locationPermissionGranted)
+            {
+                val locationResult = fusedLocationProviderClient.lastLocation
+                locationResult.addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful)
+                    {
+                        lastKnownLocation = task.result
+
+                        if (lastKnownLocation != null)
+                            animateCameraToLocation(lastKnownLocation!!)
+
+                    }
+                    else
+                    {
+                        val nisLocation = Location("Nis")
+                        nisLocation.latitude = 43.304
+                        nisLocation.longitude = 21.9
+                        animateCameraToLocation(nisLocation)
+                        mMap.uiSettings.isMyLocationButtonEnabled = false
+                    }
+                }
+            }
+        } catch (e: SecurityException)
+        {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    override fun onLocationChanged(p0: Location)
+    {
+        getDeviceLocation()
+        updateMapMarkers()
+    }
+
+    private fun getPlacesListFromDB()
+    {
+        Firebase.firestore.collection("places").addSnapshotListener { value, e ->
+            if (e != null)
+                return@addSnapshotListener
+
+            placesList = ArrayList<Place>()
+            for (doc in value!!)
+            {
+                val place = doc.toObject(Place::class.java)
+                placesList.add(place)
+            }
+            updateMapMarkers()
+        }
+    }
+
+    private fun addAllPlaceMarkersToMap()
+    {
+        for(place in placesList)
+        {
+            val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
+            val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
+                BitmapDescriptorFactory.fromResource(R.drawable.ar_marker))
+
+            if(auth.currentUser != null)
+                if(place.guideID == auth.currentUser!!.uid)
+                    placeMarker.draggable(true).icon(
+                        BitmapDescriptorFactory.fromResource(R.drawable.ar_marker3))
+
+            mMap.addMarker(placeMarker)
+        }
+    }
+
+    private fun updateMapMarkers()
+    {
+        mMap.clear()
+        getDeviceLocation()
+        addAllPlaceMarkersToMap()
+    }
+
+    private fun addNewPlaceMarker()
+    {
+        val addPlaceDialogFragment = AddPlaceFragment(auth.currentUser!!.uid)
+        addPlaceDialogFragment.show(supportFragmentManager, "AddPlaceFragment")
+    }
+
+    private fun showPlaceDialog(placeID: String)
+    {
+        val placeDialogFragment = MarkerFragment(placeID)
+        placeDialogFragment.show(supportFragmentManager, "MarkerFragment")
     }
 
     private fun deleteOldModels()
@@ -179,7 +476,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
             {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
                 {
-
                     compressBitmapToStream(nearestPlace.id, resource)
                     val modelUri = downloadModel(nearestPlace.model_for_ar)
                     goToARActivity(nearestPlace.id, modelUri)
@@ -222,278 +518,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
         downloadID = downloadManager.enqueue(request)
 
         return Uri.fromFile(file)
-    }
-
-
-
-
-    private fun setupNavView()
-    {
-        actionBarDrawerToggle = ActionBarDrawerToggle(
-            this,
-            binding.drawerLayoutMap,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        binding.drawerLayoutMap.addDrawerListener(actionBarDrawerToggle!!)
-        actionBarDrawerToggle!!.syncState()
-        binding.navViewGuide.setNavigationItemSelectedListener{ menuItem ->
-            userMenuSelector(menuItem)
-            false
-        }
-    }
-
-    private fun setupNavViewHeader()
-    {
-        Firebase.firestore.collection("users").document(auth.currentUser!!.uid).get()
-            .addOnSuccessListener { document ->
-                val user = document.toObject(User::class.java)
-                Glide.with(this).load(user!!.profile_image)
-                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
-                binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
-                    user!!.organization_name
-                binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user!!.phone
-
-            }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        return if(actionBarDrawerToggle != null)
-        {
-            if (actionBarDrawerToggle!!.onOptionsItemSelected(item))
-            {
-                true
-            }
-            else super.onOptionsItemSelected(item)
-        }
-        else super.onOptionsItemSelected(item)
-    }
-
-    fun userMenuSelector(item: MenuItem)
-    {
-        when (item.itemId)
-        {
-            R.id.nav_places ->
-            {
-                val placesIntent = Intent(this, GuidePlacesActivity::class.java)
-                startActivity(placesIntent)
-            }
-            R.id.nav_signout ->
-            {
-                auth.signOut()
-                finish()
-            }
-        }
-    }
-
-
-
-    private fun addNewPlaceMarker()
-    {
-        val addPlaceDialogFragment = AddPlaceFragment(auth.currentUser!!.uid)
-        addPlaceDialogFragment.show(supportFragmentManager, "AddPlaceFragment")
-    }
-
-
-    override fun onMapReady(googleMap: GoogleMap)
-    {
-        mMap = googleMap
-        getLocationPermission()
-        updateLocationUI()
-        getDeviceLocation()
-        getPlacesListFromDB()
-
-        mMap.setOnInfoWindowClickListener { marker ->
-           if(marker.snippet.startsWith("Click here to see more"))
-           {
-               val index = marker.snippet.indexOf("ID:") + 3
-               val placeID = marker.snippet.substring(index)
-               showPlaceDialog(placeID)
-           }
-        }
-
-        mMap.setOnMarkerDragListener(object : OnMarkerDragListener
-        {
-            override fun onMarkerDragStart(marker: Marker)
-            {}
-
-            override fun onMarkerDragEnd(marker: Marker)
-            {
-                if(marker.snippet.startsWith("Click here to see more"))
-                {
-                    val index = marker.snippet.indexOf("ID:") + 3
-                    val placeID = marker.snippet.substring(index)
-                    val newGeoPoint = GeoPoint(marker.position.latitude,marker.position.longitude)
-                    val placeGeoPoint = hashMapOf("geoPoint" to newGeoPoint)
-                    Firebase.firestore.collection("places").document(placeID).set(placeGeoPoint, SetOptions.merge())
-                }
-            }
-
-            override fun onMarkerDrag(marker: Marker)
-            {}
-        })
-
-
-    }
-
-    private fun showPlaceDialog(placeID: String)
-    {
-        val placeDialogFragment = MarkerFragment(placeID)
-        placeDialogFragment.show(supportFragmentManager, "MarkerFragment")
-    }
-
-
-    private fun getLocationPermission()
-    {
-        if (ContextCompat.checkSelfPermission(
-                this.applicationContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            == PackageManager.PERMISSION_GRANTED
-        )
-        {
-            locationPermissionGranted = true
-        }
-        else
-        {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>,
-                                            grantResults: IntArray)
-    {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        locationPermissionGranted = false
-
-        when (requestCode)
-        {
-            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION ->
-            {
-
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    locationPermissionGranted = true
-
-            }
-        }
-        updateLocationUI()
-    }
-
-    private fun updateLocationUI()
-    {
-        try
-        {
-            if (locationPermissionGranted)
-            {
-                mMap.isMyLocationEnabled = true
-                mMap.uiSettings.isMyLocationButtonEnabled = true
-            }
-            else
-            {
-                mMap.isMyLocationEnabled = false
-                mMap.uiSettings.isMyLocationButtonEnabled = false
-                lastKnownLocation = null
-                getLocationPermission()
-            }
-        } catch (e: SecurityException)
-        {
-            Log.e("Exception: %s", e.message, e)
-        }
-    }
-
-
-    private fun animateCameraToLocation(location: Location)
-    {
-        val bottomBoundary = location.latitude - .1
-        val leftBoundary = location.longitude - .1
-        val topBoundary = location.latitude + .1
-        val rightBoundary = location.longitude + .1
-        val mMapBoundary = LatLngBounds(LatLng(bottomBoundary, leftBoundary), LatLng(topBoundary, rightBoundary))
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0))
-    }
-
-    private fun getDeviceLocation()
-    {
-        try
-        {
-            if (locationPermissionGranted)
-            {
-                val locationResult = fusedLocationProviderClient.lastLocation
-                locationResult.addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful)
-                    {
-                        lastKnownLocation = task.result
-                        if (lastKnownLocation != null)
-                        {
-                            animateCameraToLocation(lastKnownLocation!!)
-                        }
-                    }
-                    else
-                    {
-                        val nisLocation = Location("Nis")
-                        nisLocation.latitude = 43.304
-                        nisLocation.longitude = 21.9
-                        animateCameraToLocation(nisLocation)
-                        mMap.uiSettings.isMyLocationButtonEnabled = false
-                    }
-                }
-            }
-        } catch (e: SecurityException)
-        {
-            Log.e("Exception: %s", e.message, e)
-        }
-    }
-
-    override fun onLocationChanged(p0: Location)
-    {
-        getDeviceLocation()     //PROVERI DA LI RADI LEPO
-        updateMapMarkers()
-    }
-
-    private fun getPlacesListFromDB()
-    {
-        Firebase.firestore.collection("places").addSnapshotListener { value, e ->
-            if (e != null)
-                return@addSnapshotListener
-
-            placesList = ArrayList<Place>()
-            for (doc in value!!)
-            {
-                val place = doc.toObject(Place::class.java)
-                placesList.add(place)
-            }
-            updateMapMarkers()
-        }
-    }
-
-    private fun addAllPlaceMarkersToMap()
-    {
-        for(place in placesList)
-        {
-            val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
-            val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
-                BitmapDescriptorFactory.fromResource(R.drawable.ar_marker))
-
-            if(auth.currentUser != null)
-                if(place.guideID == auth.currentUser!!.uid)
-                    placeMarker.draggable(true).icon(
-                        BitmapDescriptorFactory.fromResource(R.drawable.ar_marker3))
-
-            mMap.addMarker(placeMarker)
-        }
-    }
-
-    private fun updateMapMarkers()
-    {
-        mMap.clear()
-        getDeviceLocation()
-        addAllPlaceMarkersToMap()
     }
 
 

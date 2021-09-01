@@ -8,17 +8,15 @@ import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 
 class RegisterActivity : AppCompatActivity()
 {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
-    private var user: FirebaseUser? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -26,8 +24,8 @@ class RegisterActivity : AppCompatActivity()
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = Firebase.auth
         setupOnClickListeners()
+        auth = Firebase.auth
     }
 
     private fun setupOnClickListeners()
@@ -41,9 +39,7 @@ class RegisterActivity : AppCompatActivity()
         }
 
         binding.txtSignIn.setOnClickListener {
-            val loginIntent = Intent(this, LoginActivity::class.java)
-            startActivity(loginIntent)
-            finish()
+            sendToLogin()
         }
     }
 
@@ -51,7 +47,7 @@ class RegisterActivity : AppCompatActivity()
     private fun registerUser()
     {
 
-        if (checkInputError())
+        if (hasNoInputErrors())
         {
             val email: String = binding.txtEmailRegister.text.toString().trim()
             val password: String = binding.txtPasswordRegister.text.toString().trim()
@@ -59,34 +55,15 @@ class RegisterActivity : AppCompatActivity()
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
 
                 if (task.isSuccessful)
-                {
-                    Toast.makeText(
-                        applicationContext,
-                        "Registration successful!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    loginUser(email, password)
-                }
+                   onRegistrationSuccessful(email, password)
                 else
-                {
-                    if (task.exception is FirebaseAuthUserCollisionException) Toast.makeText(
-                        applicationContext,
-                        "User with this Email already exists.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    else Toast.makeText(
-                        applicationContext,
-                        "There was an error. Try again later.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                    task.exception?.let { onRegistrationFailed(it) }
             }
         }
 
     }
 
-    private fun checkInputError(): Boolean
+    private fun hasNoInputErrors(): Boolean
     {
         val email: String = binding.txtEmailRegister.text.toString().trim()
         val password: String = binding.txtPasswordRegister.text.toString().trim()
@@ -132,15 +109,39 @@ class RegisterActivity : AppCompatActivity()
         return true
     }
 
+    private fun onRegistrationSuccessful(email: String,password: String)
+    {
+        Toast.makeText(
+            applicationContext,
+            "Registration successful!",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        loginUser(email, password)
+    }
+
+    private fun onRegistrationFailed(exception: Exception)
+    {
+        if (exception is FirebaseAuthUserCollisionException) Toast.makeText(
+            applicationContext,
+            "User with this Email already exists.",
+            Toast.LENGTH_SHORT
+        ).show()
+        else Toast.makeText(
+            applicationContext,
+            "There was an error. Try again later.",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
     private fun loginUser(email:String, password:String)
     {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+
             if (task.isSuccessful)
-            {
-                user = auth.currentUser
                 addUserToDatabase()
-            }
-            else Toast.makeText(
+            else
+                Toast.makeText(
                 applicationContext,
                 "There was an error logging in.",
                 Toast.LENGTH_SHORT
@@ -150,10 +151,10 @@ class RegisterActivity : AppCompatActivity()
 
     private fun addUserToDatabase()
     {
-        if(user != null)
+        if(auth.currentUser != null)
         {
             val user = hashMapOf(
-                "userID" to user!!.uid,
+                "userID" to auth.currentUser!!.uid,
                 "email" to binding.txtEmailRegister.text.toString().trim()
             )
 
@@ -161,6 +162,13 @@ class RegisterActivity : AppCompatActivity()
                 sendToRegister2()
             }
         }
+    }
+
+    private fun sendToLogin()
+    {
+        val loginIntent = Intent(this, LoginActivity::class.java)
+        startActivity(loginIntent)
+        finish()
     }
 
     private fun sendToRegister2()

@@ -62,6 +62,7 @@ class MarkerFragment(private val placeID:String) : DialogFragment()
 
             val place = document?.toObject(Place::class.java)
             Glide.with(this).load(place!!.image_for_scanning).into(binding.markerFragmentImage)
+            binding.markerFragmentType.text = place.type
             binding.markerFragmentName.text = place.name
             binding.markerFragmentDescription.text = place.description
         }

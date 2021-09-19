@@ -20,6 +20,8 @@ import android.text.Editable
 
 import android.text.TextWatcher
 import android.util.Log
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -94,9 +96,22 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-
         setupOnClickListeners()
         setupTextChangeListeners()
+        setupSpinner()
+    }
+
+    private fun setupSpinner()
+    {
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.place_types_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.listTypeAddPlace.adapter = adapter
+        }
+
     }
 
 
@@ -224,7 +239,8 @@ class AddPlaceFragment(private val guideID:String) : DialogFragment()
             val place = hashMapOf("guideID" to guideID,
                                     "name" to binding.txtNameAddPlace.text.toString().trim(),
                                     "description" to binding.txtDescriptionAddPlace.text.toString().trim(),
-                                    "geoPoint" to markerGeoPoint)
+                                    "geoPoint" to markerGeoPoint,
+                                    "type" to binding.listTypeAddPlace.selectedItem.toString())
 
             val addedDocRef = Firebase.firestore.collection("places").add(place)
 

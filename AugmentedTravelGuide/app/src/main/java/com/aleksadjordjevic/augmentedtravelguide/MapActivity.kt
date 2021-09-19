@@ -60,7 +60,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
 
     private lateinit var auth:FirebaseAuth
-    private lateinit var navViewHeaderListener:ListenerRegistration
+    private var navViewHeaderListener:ListenerRegistration? = null
 
     private lateinit var mMap: GoogleMap
     private var locationPermissionGranted = false
@@ -97,7 +97,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     override fun onDestroy()
     {
         super.onDestroy()
-        navViewHeaderListener.remove()
+        navViewHeaderListener?.remove()
     }
 
     @SuppressLint("RtlHardcoded")
@@ -136,21 +136,58 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
     private fun setupNavViewHeader()
     {
-        navViewHeaderListener = Firebase.firestore.collection("users").document(auth.currentUser!!.uid).addSnapshotListener { value, e ->
-            if (e != null)
-                return@addSnapshotListener
+       Firebase.firestore.collection("users").document(auth.currentUser!!.uid).get().addOnCompleteListener {task ->
 
-            val user = value!!.toObject(User::class.java)
-            if(user!!.profile_image != "")
-                Glide.with(this).load(user!!.profile_image)
-                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
-            else
-                Glide.with(this).load(R.drawable.user)
-                    .into(binding.navViewGuide.findViewById(R.id.navViewImage))
-            binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
-                user.organization_name
-            binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
+           if(task.isSuccessful)
+           {
+               val user = task.result!!.toObject(User::class.java)
+               val navViewImage = binding.navViewGuide.findViewById<ImageView>(R.id.navViewImage)
+               if (user!!.profile_image != "")
+                   Glide.with(this).load(user!!.profile_image)
+                       .into(navViewImage)
+               else
+                   Glide.with(this).load(R.drawable.user)
+                       .into(navViewImage)
+               binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
+                   user.organization_name
+               binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
+
+
+               navViewHeaderListener = Firebase.firestore.collection("users").document(auth.currentUser!!.uid).addSnapshotListener { value, e ->
+                   if (e != null)
+                       return@addSnapshotListener
+
+                   val user = value!!.toObject(User::class.java)
+                   val navViewImage = binding.navViewGuide.findViewById<ImageView>(R.id.navViewImage)
+                   if(user!!.profile_image != "")
+                       Glide.with(this).load(user!!.profile_image)
+                           .into(navViewImage)
+                   else
+                       Glide.with(this).load(R.drawable.user)
+                           .into(navViewImage)
+                   binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
+                       user.organization_name
+                   binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
+               }
+           }
         }
+
+//        navViewHeaderListener = Firebase.firestore.collection("users").document(auth.currentUser!!.uid).addSnapshotListener { value, e ->
+//            if (e != null)
+//                return@addSnapshotListener
+//
+//            val user = value!!.toObject(User::class.java)
+//            //val navViewImage = binding.navViewGuide.findViewById<ImageView>(R.id.navViewImage)
+//            if(user!!.profile_image != "")
+//                Glide.with(this).load(user!!.profile_image)
+//                    .into(navViewImage)
+//            else
+//                Glide.with(this).load(R.drawable.user)
+//                    .into(navViewImage)
+//            binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
+//                user.organization_name
+//            binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
+//        }
     }
 
     private fun hideNavView()
@@ -390,17 +427,47 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     {
         for(place in placesList)
         {
-            val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
-            val placeMarker = MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
-                BitmapDescriptorFactory.fromResource(R.drawable.ar_marker))
 
-            if(auth.currentUser != null)
-                if(place.guideID == auth.currentUser!!.uid)
-                    placeMarker.draggable(true).icon(
-                        BitmapDescriptorFactory.fromResource(R.drawable.ar_marker3))
-
+            val placeMarker = createOthersMarker(place)
+            checkIfMyMarker(place, placeMarker)
             mMap.addMarker(placeMarker)
         }
+    }
+
+    private fun createOthersMarker(place: Place):MarkerOptions
+    {
+        val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
+        val markerIconRes= when(place.type)
+        {
+            "Historic Monument" -> R.drawable.ar_marker_historic
+            "Education" -> R.drawable.ar_marker_education
+            "Catering" -> R.drawable.ar_marker_catering
+            "Entertainment" -> R.drawable.ar_marker_entertainment
+            "Sports" -> R.drawable.ar_marker_sports
+            else -> R.drawable.ar_marker
+        }
+
+        return MarkerOptions().position(placeLatLng).title(place.name).snippet("Click here to see more \n ID:${place.id}").icon(
+            BitmapDescriptorFactory.fromResource(markerIconRes))
+    }
+
+    private fun checkIfMyMarker(place: Place, placeMarker: MarkerOptions)
+    {
+        val markerIconRes= when(place.type)
+        {
+            "Historic Monument" -> R.drawable.ar_marker_historic_2
+            "Education" -> R.drawable.ar_marker_education_2
+            "Catering" -> R.drawable.ar_marker_catering_2
+            "Entertainment" -> R.drawable.ar_marker_entertainment_2
+            "Sports" -> R.drawable.ar_marker_sports_2
+            else -> R.drawable.ar_marker3
+        }
+
+
+        if(auth.currentUser != null)
+            if(place.guideID == auth.currentUser!!.uid)
+                placeMarker.draggable(true).icon(
+                    BitmapDescriptorFactory.fromResource(markerIconRes))
     }
 
     private fun updateMapMarkers()

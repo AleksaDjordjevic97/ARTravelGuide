@@ -11,6 +11,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
@@ -76,6 +77,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+        setupSpinner()
 
         Glide.with(this).load(place.image_for_scanning).into(binding.guidePlacesFragmentImage)
         binding.guidePlacesFragmentName.setText(place.name)
@@ -87,7 +89,29 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
 
     }
 
+    private fun setupSpinner()
+    {
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.place_types_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.guidePlacesFragmentType.adapter = adapter
+        }
 
+
+        val placeTypesArray = requireContext().resources.getStringArray(R.array.place_types_array)
+        for(i in placeTypesArray.indices)
+        {
+            if(placeTypesArray[i] == place.type)
+            {
+                binding.guidePlacesFragmentType.setSelection(i)
+                return
+            }
+        }
+
+    }
 
     private fun openGallery()
     {
@@ -123,6 +147,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
                         place.image_for_scanning = uri.toString()
                         place.name = binding.guidePlacesFragmentName.text.toString()
                         place.description = binding.guidePlacesFragmentDescription.text.toString()
+                        place.type = binding.guidePlacesFragmentType.selectedItem.toString()
 
                         updatePlaceInDB()
                     }
@@ -132,6 +157,7 @@ class GuidePlacesFragment(private val place:Place) : DialogFragment()
             {
                 place.name = binding.guidePlacesFragmentName.text.toString()
                 place.description = binding.guidePlacesFragmentDescription.text.toString()
+                place.type = binding.guidePlacesFragmentType.selectedItem.toString()
 
                 updatePlaceInDB()
             }

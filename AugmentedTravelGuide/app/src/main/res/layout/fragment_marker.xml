@@ -30,6 +30,21 @@
         android:src="@drawable/logo_globe"/>
 
     <TextView
+        android:id="@+id/markerFragmentType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_green"
+        android:fontFamily="@font/momcake_thin"
+        android:padding="5dp"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
         android:id="@+id/markerFragmentName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,7 +70,9 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:fontFamily="@font/momcake_thin"
-        android:textAlignment="textStart" />
+        android:textAlignment="textStart"
+        android:background="@drawable/description_frame"
+        android:padding="3dp"/>
 
 
 

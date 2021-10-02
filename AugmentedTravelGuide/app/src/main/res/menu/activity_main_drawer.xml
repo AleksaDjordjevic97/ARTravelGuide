@@ -12,7 +12,12 @@
         <item
             android:id="@+id/nav_places"
             android:icon="@drawable/nav_places"
-            android:title="Places" />
+            android:title="My Places" />
+
+        <item
+            android:id="@+id/nav_add_places"
+            android:icon="@drawable/add_place_btn"
+            android:title="Add Place" />
         <item
             android:id="@+id/nav_signout"
             android:icon="@drawable/nav_signout"

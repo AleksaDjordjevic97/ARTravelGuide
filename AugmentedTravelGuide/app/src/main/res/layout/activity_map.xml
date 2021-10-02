@@ -32,13 +32,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAddPlace"
+            android:id="@+id/fabFilters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="30dp"
             android:backgroundTint="@color/app_green"
-            android:src="@drawable/add_place_btn"
+            android:src="@drawable/filter_btn"
             android:scaleType="center"
             app:maxImageSize="35dp"
             app:fabCustomSize="70dp"

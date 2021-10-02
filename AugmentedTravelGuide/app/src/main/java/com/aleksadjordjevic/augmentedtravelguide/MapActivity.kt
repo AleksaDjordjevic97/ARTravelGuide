@@ -30,6 +30,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.aleksadjordjevic.augmentedtravelguide.databinding.ActivityMapBinding
 import com.aleksadjordjevic.augmentedtravelguide.fragments.AddPlaceFragment
+import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFilterFragment
 import com.aleksadjordjevic.augmentedtravelguide.fragments.MarkerFragment
 import com.aleksadjordjevic.augmentedtravelguide.models.Place
 import com.aleksadjordjevic.augmentedtravelguide.models.User
@@ -53,7 +54,7 @@ import com.google.firebase.firestore.SetOptions
 
 private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, MarkerFilterFragment.OnFilterChangeListener
 {
 
     private lateinit var binding: ActivityMapBinding
@@ -70,6 +71,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private var placesList = ArrayList<Place>()
     private var markersList= ArrayList<MarkerOptions>()
     private var downloadID:Long = 0L
+
+    private var showHistoric = true
+    private var showEducation = true
+    private var showCatering = true
+    private var showEntertainment = true
+    private var showSports = true
+    private var filterDistance:Int? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -109,8 +118,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
             getNearestPlaceToUser()
         }
 
-        binding.fabAddPlace.setOnClickListener {
-            addNewPlaceMarker()
+        binding.fabFilters.setOnClickListener {
+            openFilterDialog()
         }
 
         binding.btnOpenNavView.setOnClickListener {
@@ -193,7 +202,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
     private fun hideNavView()
     {
-        binding.fabAddPlace.visibility = View.INVISIBLE
         binding.btnOpenNavView.visibility = View.INVISIBLE
         binding.drawerLayoutMap.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
@@ -229,6 +237,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
             {
                 auth.signOut()
                 finish()
+            }
+            R.id.nav_add_places ->
+            {
+                binding.drawerLayoutMap.closeDrawer(Gravity.LEFT)
+                addNewPlaceMarker()
             }
         }
     }
@@ -478,7 +491,58 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
     private fun checkIfIsFilteredMarker(place: Place, placeMarker: MarkerOptions)
     {
+        val showMarker = when(place.type)
+        {
+            "Historic Monument" -> showHistoric
+            "Education" -> showEducation
+            "Catering" -> showCatering
+            "Entertainment" -> showEntertainment
+            "Sports" -> showSports
+            else -> false
+        }
 
+        if(showMarker && isWithinDistance(place))
+            markersList.add(placeMarker)
+    }
+
+    private fun isWithinDistance(place: Place): Boolean
+    {
+        return if(filterDistance != null)
+        {
+            val placeLocation = Location("placeLocation")
+            placeLocation.latitude = place.geoPoint.latitude
+            placeLocation.longitude = place.geoPoint.longitude
+
+            val distance = lastKnownLocation!!.distanceTo(placeLocation)
+
+            distance <= filterDistance!!
+        }
+        else
+            true
+
+    }
+
+    private fun openFilterDialog()
+    {
+        val filterFragment = MarkerFilterFragment(showHistoric,showEducation,showCatering,showEntertainment,showSports,filterDistance,this)
+        filterFragment.show(supportFragmentManager, "MarkerFilterFragment")
+    }
+
+    override fun onApplyFilter(showHistoric: Boolean,
+                               showEducation: Boolean,
+                               showCatering: Boolean,
+                               showEntertainment: Boolean,
+                               showSports: Boolean,
+                               distance: Int?)
+    {
+        this.showHistoric = showHistoric
+        this.showEducation = showEducation
+        this.showCatering = showCatering
+        this.showEntertainment = showEntertainment
+        this.showSports = showSports
+        filterDistance = distance
+
+        updateMapMarkers()
     }
 
     private fun updateMapMarkers()
@@ -597,6 +661,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
         return Uri.fromFile(file)
     }
+
 
 
 

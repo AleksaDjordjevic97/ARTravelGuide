@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.AddPlaceFragment">
+
+    <ImageButton
+        android:id="@+id/btCloseFilter"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/close_btn"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewFilterPlaces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/momcake_bold"
+        android:text="Filter Places"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imgFilterHistoric"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/filter_historic"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/guidelineFilterHistoricStart"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFilterPlaces"
+        app:layout_constraintWidth_percent="0.2"
+        android:layout_marginTop="40dp"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchHistoric"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imgFilterHistoric"
+        app:layout_constraintStart_toStartOf="@+id/imgFilterHistoric"
+        app:layout_constraintTop_toBottomOf="@+id/imgFilterHistoric"
+        android:checked="true"
+        android:theme="@style/ThemeOverlay.MySwitchCompat"/>
+
+    <ImageView
+        android:id="@+id/imgFilterEducation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/filter_education"
+        app:layout_constraintBottom_toBottomOf="@+id/imgFilterHistoric"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/guidelineFilterEducationStart"
+        app:layout_constraintTop_toTopOf="@+id/imgFilterHistoric"
+        app:layout_constraintWidth_percent="0.2" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchEducation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imgFilterEducation"
+        app:layout_constraintStart_toStartOf="@+id/imgFilterEducation"
+        app:layout_constraintTop_toBottomOf="@+id/imgFilterEducation"
+        android:checked="true"
+        android:theme="@style/ThemeOverlay.MySwitchCompat"/>
+
+    <ImageView
+        android:id="@+id/imgFilterCatering"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/filter_catering"
+        app:layout_constraintBottom_toBottomOf="@+id/imgFilterEducation"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/guidelineFilterCateringStart"
+        app:layout_constraintTop_toTopOf="@+id/imgFilterEducation"
+        app:layout_constraintWidth_percent="0.2" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchCatering"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imgFilterCatering"
+        app:layout_constraintStart_toStartOf="@+id/imgFilterCatering"
+        app:layout_constraintTop_toBottomOf="@+id/imgFilterCatering"
+        android:checked="true"
+        android:theme="@style/ThemeOverlay.MySwitchCompat"/>
+
+
+    <ImageView
+        android:id="@+id/imgFilterEntertainment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/filter_entertainment"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/guidelineFilterEntertainmentStart"
+        app:layout_constraintTop_toBottomOf="@+id/switchHistoric"
+        app:layout_constraintWidth_percent="0.2"
+        android:layout_marginTop="50dp"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchEntertainment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imgFilterEntertainment"
+        app:layout_constraintStart_toStartOf="@+id/imgFilterEntertainment"
+        app:layout_constraintTop_toBottomOf="@+id/imgFilterEntertainment"
+        android:checked="true"
+        android:theme="@style/ThemeOverlay.MySwitchCompat"/>
+
+
+    <ImageView
+        android:id="@+id/imgFilterSports"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/filter_sports"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/guidelineFilterSportStart"
+        app:layout_constraintTop_toBottomOf="@+id/switchHistoric"
+        app:layout_constraintWidth_percent="0.2"
+        android:layout_marginTop="50dp"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchSports"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imgFilterSports"
+        app:layout_constraintStart_toStartOf="@+id/imgFilterSports"
+        app:layout_constraintTop_toBottomOf="@+id/imgFilterSports"
+        android:checked="true"
+        android:theme="@style/ThemeOverlay.MySwitchCompat"/>
+
+
+    <TextView
+        android:id="@+id/textViewFilterDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/momcake_bold"
+        android:text="Filter Distance"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switchEntertainment" />
+
+    <EditText
+        android:id="@+id/txtFilterDistance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFilterDistance"
+        app:layout_constraintWidth_percent="0.3" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.05"
+        android:src="@drawable/meter"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtFilterDistance"
+        app:layout_constraintStart_toEndOf="@+id/txtFilterDistance"
+        app:layout_constraintTop_toTopOf="@+id/txtFilterDistance" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnAddPlace"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/button_green"
+        android:fontFamily="@font/momcake_bold"
+        android:text="FILTER"
+        android:textSize="25sp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFilterHistoricStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFilterEducationStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFilterCateringStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7"/>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFilterEntertainmentStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFilterSportStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

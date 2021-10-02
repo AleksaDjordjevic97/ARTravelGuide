@@ -68,6 +68,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
     private var lastKnownLocation: Location? = null
 
     private var placesList = ArrayList<Place>()
+    private var markersList= ArrayList<MarkerOptions>()
     private var downloadID:Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -425,14 +426,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
 
     private fun addAllPlaceMarkersToMap()
     {
+        markersList.clear()
+
         for(place in placesList)
         {
-
             val placeMarker = createOthersMarker(place)
             checkIfMyMarker(place, placeMarker)
-            mMap.addMarker(placeMarker)
+            checkIfIsFilteredMarker(place,placeMarker)
         }
+
+        for(marker in markersList)
+            mMap.addMarker(marker)
     }
+
 
     private fun createOthersMarker(place: Place):MarkerOptions
     {
@@ -468,6 +474,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener
             if(place.guideID == auth.currentUser!!.uid)
                 placeMarker.draggable(true).icon(
                     BitmapDescriptorFactory.fromResource(markerIconRes))
+    }
+
+    private fun checkIfIsFilteredMarker(place: Place, placeMarker: MarkerOptions)
+    {
+
     }
 
     private fun updateMapMarkers()

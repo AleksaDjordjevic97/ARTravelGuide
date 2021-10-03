@@ -45,7 +45,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.File
 import com.google.android.gms.maps.model.Marker
-
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
@@ -86,28 +85,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
+        setupMapFragmentAndLocationClient()
         setupOnClickListeners()
+
         setupNavView()
-
-        auth = FirebaseAuth.getInstance()
-        if(auth.currentUser == null)
-            hideNavView()
-        else
-            setupNavViewHeader()
-
+        checkIfTouristOrGuideForNavView()
 
         registerReceiverForModelDownloads()
-
     }
 
     override fun onDestroy()
     {
         super.onDestroy()
         navViewHeaderListener?.remove()
+    }
+
+    private fun setupMapFragmentAndLocationClient()
+    {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     @SuppressLint("RtlHardcoded")
@@ -141,7 +138,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
             userMenuSelector(menuItem)
             false
         }
+    }
 
+    private fun checkIfTouristOrGuideForNavView()
+    {
+        auth = FirebaseAuth.getInstance()
+        if(auth.currentUser == null)
+            hideNavView()
+        else
+            setupNavViewHeader()
     }
 
     private fun setupNavViewHeader()
@@ -181,23 +186,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
                }
            }
         }
-
-//        navViewHeaderListener = Firebase.firestore.collection("users").document(auth.currentUser!!.uid).addSnapshotListener { value, e ->
-//            if (e != null)
-//                return@addSnapshotListener
-//
-//            val user = value!!.toObject(User::class.java)
-//            //val navViewImage = binding.navViewGuide.findViewById<ImageView>(R.id.navViewImage)
-//            if(user!!.profile_image != "")
-//                Glide.with(this).load(user!!.profile_image)
-//                    .into(navViewImage)
-//            else
-//                Glide.with(this).load(R.drawable.user)
-//                    .into(navViewImage)
-//            binding.navViewGuide.findViewById<TextView>(R.id.navViewName).text =
-//                user.organization_name
-//            binding.navViewGuide.findViewById<TextView>(R.id.navViewPhone).text = user.phone
-//        }
     }
 
     private fun hideNavView()
@@ -219,7 +207,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
         else super.onOptionsItemSelected(item)
     }
 
-    fun userMenuSelector(item: MenuItem)
+    private fun userMenuSelector(item: MenuItem)
     {
         when (item.itemId)
         {
@@ -263,7 +251,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
     override fun onMapReady(googleMap: GoogleMap)
     {
         mMap = googleMap
-        getLocationPermission()
+        checkIfLocationPermissionGranted()
         showMyLocationOnMap()
         getDeviceLocation()
         getPlacesListFromDB()
@@ -309,7 +297,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
 
     }
 
-    private fun getLocationPermission()
+    private fun checkIfLocationPermissionGranted()
     {
         if (ContextCompat.checkSelfPermission(
                 this.applicationContext,
@@ -364,7 +352,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
                 mMap.isMyLocationEnabled = false
                 mMap.uiSettings.isMyLocationButtonEnabled = false
                 lastKnownLocation = null
-                getLocationPermission()
+                checkIfLocationPermissionGranted()
             }
         } catch (e: SecurityException)
         {
@@ -443,9 +431,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
 
         for(place in placesList)
         {
-            val placeMarker = createOthersMarker(place)
-            checkIfMyMarker(place, placeMarker)
-            checkIfIsFilteredMarker(place,placeMarker)
+            val placeMarker = createPlaceMarker(place)
+            checkIfMarkerBelongsToCurrentUser(place, placeMarker)
+            checkIfMarkerAppliesToFilter(place,placeMarker)
         }
 
         for(marker in markersList)
@@ -453,7 +441,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
     }
 
 
-    private fun createOthersMarker(place: Place):MarkerOptions
+    private fun createPlaceMarker(place: Place):MarkerOptions
     {
         val placeLatLng = LatLng(place.geoPoint.latitude,place.geoPoint.longitude)
         val markerIconRes= when(place.type)
@@ -470,7 +458,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
             BitmapDescriptorFactory.fromResource(markerIconRes))
     }
 
-    private fun checkIfMyMarker(place: Place, placeMarker: MarkerOptions)
+    private fun checkIfMarkerBelongsToCurrentUser(place: Place, placeMarker: MarkerOptions)
     {
         val markerIconRes= when(place.type)
         {
@@ -489,9 +477,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
                     BitmapDescriptorFactory.fromResource(markerIconRes))
     }
 
-    private fun checkIfIsFilteredMarker(place: Place, placeMarker: MarkerOptions)
+    private fun checkIfPlaceAppliesToFilter(place: Place):Boolean
     {
-        val showMarker = when(place.type)
+        val typeResult = when (place.type)
         {
             "Historic Monument" -> showHistoric
             "Education" -> showEducation
@@ -501,7 +489,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
             else -> false
         }
 
-        if(showMarker && isWithinDistance(place))
+        return typeResult && isWithinDistance(place)
+    }
+
+    private fun checkIfMarkerAppliesToFilter(place: Place, placeMarker: MarkerOptions)
+    {
+        if(checkIfPlaceAppliesToFilter(place))
             markersList.add(placeMarker)
     }
 
@@ -591,19 +584,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
                 for(doc in task.result)
                 {
                     val place = doc.toObject(Place::class.java)
-                    val placeLocation = Location("placeLocation")
-                    placeLocation.latitude = place.geoPoint.latitude
-                    placeLocation.longitude = place.geoPoint.longitude
-
-                    if(lastKnownLocation!!.distanceTo(placeLocation) < distance)
+                    
+                    if(checkIfPlaceAppliesToFilter(place))
                     {
-                        distance = lastKnownLocation!!.distanceTo(placeLocation)
-                        nearestPlace = place
+                        val placeLocation = Location("placeLocation")
+                        placeLocation.latitude = place.geoPoint.latitude
+                        placeLocation.longitude = place.geoPoint.longitude
+
+                        if (lastKnownLocation!!.distanceTo(placeLocation) < distance)
+                        {
+                            distance = lastKnownLocation!!.distanceTo(placeLocation)
+                            nearestPlace = place
+                        }
                     }
                 }
 
                 if(nearestPlace != null)
                     downloadImageAndModel(nearestPlace)
+                else
+                    Toast.makeText(this,"Unfortunately there are no markers near you",Toast.LENGTH_SHORT).show()
             }
         }
     }

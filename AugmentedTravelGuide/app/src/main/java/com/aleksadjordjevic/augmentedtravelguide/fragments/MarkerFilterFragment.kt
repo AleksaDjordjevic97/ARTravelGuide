@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
 import androidx.fragment.app.DialogFragment
 import com.aleksadjordjevic.augmentedtravelguide.R
 import com.aleksadjordjevic.augmentedtravelguide.databinding.FragmentFilterMarkersBinding
@@ -20,12 +19,6 @@ class MarkerFilterFragment(private var showHistoric:Boolean,
 {
     private var _binding: FragmentFilterMarkersBinding? = null
     private val binding get() = _binding!!
-
-//    private var showHistoricOrig = true
-//    private var showEducationOrig = true
-//    private var showCateringOrig = true
-//    private var showEntertainmentOrig = true
-//    private var showSportsOrig = true
 
     interface OnFilterChangeListener
     {
@@ -112,7 +105,6 @@ class MarkerFilterFragment(private var showHistoric:Boolean,
         }
 
     }
-
 
     private fun setupOnClickListeners()
     {

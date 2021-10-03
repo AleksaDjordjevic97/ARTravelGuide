@@ -52,6 +52,7 @@ import com.google.firebase.firestore.SetOptions
 
 
 private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100
+private const val MAX_DISTANCE_TO_MARKER_IN_METERS = 2000f
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, MarkerFilterFragment.OnFilterChangeListener
 {
@@ -578,13 +579,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, M
         Firebase.firestore.collection("places").get().addOnCompleteListener { task->
             if(task.isSuccessful)
             {
-                var distance = Float.MAX_VALUE
+                var distance = MAX_DISTANCE_TO_MARKER_IN_METERS
                 var nearestPlace:Place? = null
 
                 for(doc in task.result)
                 {
                     val place = doc.toObject(Place::class.java)
-                    
+
                     if(checkIfPlaceAppliesToFilter(place))
                     {
                         val placeLocation = Location("placeLocation")
